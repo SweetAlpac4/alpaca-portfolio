@@ -6,12 +6,6 @@ dist/
 *.local
 .DS_Store
 
-# Musik asli hanya untuk lokal (tidak di-commit/deploy)
-public/audio/*.mp3
-public/audio/*.ogg
-public/audio/*.wav
-!public/audio/.gitkeep
-
 # Aset mentah
 reference/**/*.png
 reference/**/*.jpg

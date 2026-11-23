@@ -1,5 +1,4 @@
-# Jangan deploy musik copyrighted, aset mentah, dan hasil build lokal.
-public/audio/
+# Jangan deploy aset mentah dan hasil build lokal.
 reference/
 dist/
 .env.local
