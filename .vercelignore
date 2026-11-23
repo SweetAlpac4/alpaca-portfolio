@@ -1,0 +1,6 @@
+# Jangan deploy musik copyrighted, aset mentah, dan hasil build lokal.
+public/audio/
+reference/
+dist/
+.env.local
+.vercel/
