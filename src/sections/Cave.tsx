@@ -1,6 +1,7 @@
 import type { Experience, Skill } from '../data/types'
 import { useLang } from '../i18n'
 import { BiomeBackground } from '../components/BiomeBackground'
+import { HiddenItem } from '../components/HiddenItem'
 
 type Props = {
   education: Experience[]
@@ -23,6 +24,7 @@ export function Cave({ education, skills }: Props) {
     <section id="cave" className="biome biome--cave">
       <BiomeBackground name="cave" />
       <div className="biome__scrim" />
+      <HiddenItem section="cave" />
 
       <div className="biome__inner">
         <header className="section-head">

@@ -1,6 +1,7 @@
 import type { Experience } from '../data/types'
 import { useLang } from '../i18n'
 import { BiomeBackground } from '../components/BiomeBackground'
+import { HiddenItem } from '../components/HiddenItem'
 
 type Props = {
   experiences: Experience[]
@@ -14,6 +15,7 @@ export function Nether({ experiences }: Props) {
     <section id="nether" className="biome biome--nether">
       <BiomeBackground name="nether" />
       <div className="biome__scrim" />
+      <HiddenItem section="nether" />
 
       <div className="biome__inner">
         <header className="section-head">

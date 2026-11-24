@@ -2,6 +2,7 @@ import type { Profile, Social } from '../data/types'
 import { useLang } from '../i18n'
 import { BiomeBackground } from '../components/BiomeBackground'
 import { SocialIcon } from '../components/SocialIcon'
+import { HiddenItem } from '../components/HiddenItem'
 
 type Props = {
   profile: Profile
@@ -16,6 +17,7 @@ export function TheEnd({ profile, socials }: Props) {
     <section id="the-end" className="biome biome--end">
       <BiomeBackground name="the-end" />
       <div className="biome__scrim" />
+      <HiddenItem section="the-end" />
 
       <div className="biome__inner">
         <div className="contact">

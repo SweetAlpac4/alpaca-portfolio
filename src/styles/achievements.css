@@ -1,0 +1,605 @@
+/* ---------- achievement book in the hotbar ---------- */
+
+.hotbar__slot--book {
+  margin-left: 5px;
+  background: rgba(70, 50, 30, 0.62);
+}
+
+.hotbar__slot--book:hover {
+  background: rgba(112, 78, 42, 0.8);
+}
+
+.hotbar__book-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.hotbar__slot--complete {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.hotbar__count {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  color: var(--gold);
+  font-size: 0.48rem;
+  line-height: 1.4;
+  text-shadow: 1px 1px 0 #000;
+  opacity: 0.95;
+}
+
+.hotbar__tip-key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.2em;
+  margin-left: 0.35em;
+  padding: 0 0.25em;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #bdbdbd;
+  font-size: 0.56rem;
+}
+
+/* ---------- hidden artifacts ---------- */
+
+.artifact {
+  position: absolute;
+  z-index: 4;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  filter: drop-shadow(0 0 9px rgba(255, 215, 94, 0.55));
+  transition: filter 0.16s ease;
+}
+
+.artifact::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 150, 0.38),
+    transparent 68%
+  );
+  animation: artifact-glow 2.2s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.artifact__icon {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  animation: artifact-bob 3.4s ease-in-out infinite;
+  transition: transform 0.16s ease;
+}
+
+.artifact:hover {
+  filter: drop-shadow(0 0 15px rgba(255, 230, 150, 0.95));
+}
+
+.artifact:hover .artifact__icon {
+  transform: scale(1.08);
+}
+
+.artifact__tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 0.34em 0.6em;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid #55555f;
+  color: #f0f0f0;
+  font-size: 0.62rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.artifact:hover .artifact__tip,
+.artifact:focus-visible .artifact__tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Keep tooltips from being clipped on items pinned to the right edge. */
+.artifact--overworld .artifact__tip,
+.artifact--cave .artifact__tip,
+.artifact--deep-dark .artifact__tip,
+.artifact--nether .artifact__tip,
+.artifact--the-end .artifact__tip {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+
+.artifact--overworld:hover .artifact__tip,
+.artifact--overworld:focus-visible .artifact__tip,
+.artifact--cave:hover .artifact__tip,
+.artifact--cave:focus-visible .artifact__tip,
+.artifact--deep-dark:hover .artifact__tip,
+.artifact--deep-dark:focus-visible .artifact__tip,
+.artifact--nether:hover .artifact__tip,
+.artifact--nether:focus-visible .artifact__tip,
+.artifact--the-end:hover .artifact__tip,
+.artifact--the-end:focus-visible .artifact__tip {
+  transform: translateY(0);
+}
+
+.artifact--collected {
+  animation: artifact-collect 0.52s ease forwards;
+  pointer-events: none;
+}
+
+.artifact--overworld {
+  right: 7%;
+  bottom: 16%;
+}
+
+.artifact--cave {
+  right: 3%;
+  top: 17%;
+}
+
+.artifact--deep-dark {
+  right: 3%;
+  top: 17%;
+}
+
+.artifact--nether {
+  right: 3%;
+  top: 17%;
+}
+
+.artifact--the-end {
+  left: 55%;
+  bottom: 14%;
+}
+
+.artifact--credits {
+  left: 9%;
+  top: 20%;
+}
+
+@keyframes artifact-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes artifact-glow {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes artifact-collect {
+  to {
+    transform: scale(1.9) translateY(-14px);
+    opacity: 0;
+  }
+}
+
+/* ---------- book modal ---------- */
+
+.book-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(3, 3, 7, 0.76);
+  backdrop-filter: blur(6px);
+  animation: book-overlay-in 0.18s ease;
+}
+
+.book {
+  width: min(900px, 94vw);
+  max-height: min(86vh, 820px);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #17130f, #0d0b0a 40%, #0a0908);
+  border: 3px solid #000;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.08),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.8),
+    0 24px 60px rgba(0, 0, 0, 0.6);
+  animation: book-in 0.2s ease;
+}
+
+.book__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px 14px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+}
+
+.book__title {
+  margin-top: 0.25em;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  color: #ffe7a0;
+}
+
+.book__sub {
+  margin-top: 0.5em;
+  max-width: 55ch;
+  color: #b9b3a6;
+  font-size: 0.78rem;
+}
+
+.book__close {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: #2a2119;
+  border: 2px solid #000;
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.7);
+  color: #e8d8b0;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.book__close:hover {
+  background: #4a3724;
+  color: #fff3b0;
+}
+
+.book__progress {
+  padding: 14px 24px 0;
+}
+
+.book__progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #a79e8c;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.book__progress-top strong {
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.book__bar {
+  height: 10px;
+  margin-top: 6px;
+  background: #080706;
+  border: 2px solid #000;
+  box-shadow: inset 0 0 0 1px #2c241a;
+}
+
+.book__bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(#ffe38a, #c79a25);
+  transition: width 0.3s ease;
+}
+
+.book__body {
+  padding: 18px 24px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.advancement-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.advancement-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 2px solid #241d16;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.04);
+  opacity: 0.84;
+}
+
+.advancement-card--found {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 94, 0.08),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-color: #6d5720;
+  opacity: 1;
+}
+
+.advancement-card--meta {
+  grid-column: 1 / -1;
+}
+
+.advancement-card__icon {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.06);
+}
+
+.advancement-card__icon svg {
+  width: 34px;
+  height: 34px;
+}
+
+.advancement-card:not(.advancement-card--found) .advancement-card__icon svg {
+  filter: grayscale(1) brightness(0.45);
+  opacity: 0.55;
+}
+
+.advancement-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.advancement-card__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.advancement-card__title {
+  font-size: 0.9rem;
+  color: #f2e9d4;
+}
+
+.advancement-card__state {
+  flex: 0 0 auto;
+  color: #7c7568;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.advancement-card__state--found {
+  color: #8fe06b;
+}
+
+.advancement-card__desc {
+  margin-top: 0.4em;
+  color: #b9b3a6;
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.advancement-card__hint {
+  display: block;
+  margin-bottom: 0.18em;
+  color: var(--gold);
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.book__complete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 94, 0.13),
+    rgba(255, 215, 94, 0.03)
+  );
+  border: 2px solid #5f4a18;
+}
+
+.book__complete-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+}
+
+.book__complete-title {
+  color: #ffe7a0;
+  font-size: 0.82rem;
+}
+
+.book__complete-sub {
+  margin-top: 0.2em;
+  color: #c8bea5;
+  font-size: 0.66rem;
+}
+
+.book__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px 16px;
+  border-top: 2px solid rgba(255, 255, 255, 0.06);
+  color: #8f887a;
+  font-size: 0.6rem;
+}
+
+.book__foot p {
+  max-width: 52ch;
+}
+
+/* ---------- achievement toast + secret ---------- */
+
+.toast--achievement {
+  top: 62px;
+  z-index: 48;
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.15),
+    top 0.2s ease;
+}
+
+.toast--achievement.toast--offset {
+  top: 124px;
+}
+
+.credits__block--secret {
+  padding: 10px 14px;
+  background: rgba(255, 215, 94, 0.05);
+  border: 2px solid rgba(255, 215, 94, 0.28);
+}
+
+.credits__block--secret .credits__label {
+  color: var(--gold);
+}
+
+.credits__block--secret .credits__value {
+  color: #ffe9a8;
+  text-shadow: 1px 1px 0 #000, 0 0 16px rgba(255, 215, 94, 0.25);
+}
+
+@keyframes book-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes book-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .hotbar__book-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .artifact {
+    width: 42px;
+    height: 42px;
+  }
+
+  .artifact__icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .artifact--overworld {
+    right: 4%;
+    top: 22%;
+    bottom: auto;
+  }
+
+  .artifact--cave {
+    right: 3%;
+    top: 17%;
+  }
+
+  .artifact--deep-dark {
+    right: 3%;
+    top: 17%;
+  }
+
+  .artifact--nether {
+    right: 3%;
+    top: 17%;
+  }
+
+  .artifact--the-end {
+    right: 3%;
+    top: 17%;
+    bottom: auto;
+    left: auto;
+  }
+
+  .artifact--credits {
+    top: 18%;
+    left: 7%;
+  }
+
+  .toast--achievement {
+    top: 52px;
+  }
+
+  .toast--achievement.toast--offset {
+    top: 110px;
+  }
+
+  .book-overlay {
+    align-items: end;
+    padding: 10px;
+  }
+
+  .book {
+    width: 100%;
+    max-height: 88dvh;
+  }
+
+  .book__head {
+    padding: 16px 16px 12px;
+  }
+
+  .book__sub {
+    font-size: 0.7rem;
+  }
+
+  .book__progress {
+    padding: 12px 16px 0;
+  }
+
+  .book__body {
+    padding: 12px 16px 16px;
+  }
+
+  .advancement-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .advancement-card--meta {
+    grid-column: auto;
+  }
+
+  .book__foot {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 16px 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hotbar__book-icon {
+    width: 23px;
+    height: 23px;
+  }
+}

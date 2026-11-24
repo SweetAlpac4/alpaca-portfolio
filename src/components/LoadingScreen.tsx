@@ -12,6 +12,7 @@ const TIP_KEYS = [
   'loading_tip_2',
   'loading_tip_3',
   'loading_tip_4',
+  'loading_tip_5',
 ] as const
 
 export function LoadingScreen({ ready, onPlay, onEnter }: Props) {

@@ -1,5 +1,8 @@
 import type { Localized } from '../data/types'
 import { useLang } from '../i18n'
+import { HiddenItem } from '../components/HiddenItem'
+import { useAchievements } from '../components/AchievementProvider'
+import { META_ACHIEVEMENT_ID } from '../lib/achievements'
 
 type Props = {
   name: string
@@ -11,6 +14,7 @@ type Props = {
 
 export function Credits({ name, role, credits, active, onRespawn }: Props) {
   const { t, pick } = useLang()
+  const { isUnlocked } = useAchievements()
 
   return (
     <section
@@ -18,6 +22,7 @@ export function Credits({ name, role, credits, active, onRespawn }: Props) {
       className={`biome biome--credits${active ? ' is-active' : ''}`}
     >
       <div className="stars" aria-hidden="true" />
+      <HiddenItem section="credits" />
 
       <div className="credits__viewport">
         <div className="credits__track" key={active ? 'credits-run' : 'credits-idle'}>
@@ -43,6 +48,13 @@ export function Credits({ name, role, credits, active, onRespawn }: Props) {
             <p className="credits__label">{t('credits_thanks')}</p>
             <p className="credits__value">{pick(credits)}</p>
           </div>
+
+          {isUnlocked(META_ACHIEVEMENT_ID) && (
+            <div className="credits__block credits__block--secret">
+              <p className="credits__label">{t('secret_ending_label')}</p>
+              <p className="credits__value">{t('secret_ending')}</p>
+            </div>
+          )}
 
           <p className="credits__note">{t('credits_note')}</p>
         </div>

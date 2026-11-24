@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Achievement, Project } from '../data/types'
 import { useLang } from '../i18n'
 import { BiomeBackground } from '../components/BiomeBackground'
+import { HiddenItem } from '../components/HiddenItem'
 
 type Props = {
   projects: Project[]
@@ -71,6 +72,7 @@ export function DeepDark({ projects, achievements }: Props) {
     <section id="deep-dark" className="biome biome--deep-dark">
       <BiomeBackground name="deep-dark" />
       <div className="biome__scrim" />
+      <HiddenItem section="deep-dark" />
 
       <div className="biome__inner">
         <header className="section-head section-head--deep-dark">

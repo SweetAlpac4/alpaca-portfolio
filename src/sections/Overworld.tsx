@@ -1,6 +1,7 @@
 import type { Profile } from '../data/types'
 import { useLang } from '../i18n'
 import { BiomeBackground } from '../components/BiomeBackground'
+import { HiddenItem } from '../components/HiddenItem'
 
 type Props = {
   profile: Profile
@@ -15,6 +16,7 @@ export function Overworld({ profile, onNavigate }: Props) {
     <section id="overworld" className="biome biome--overworld">
       <BiomeBackground name="overworld" eager />
       <div className="biome__scrim" />
+      <HiddenItem section="overworld" />
 
       <div className="biome__inner">
         <div className="hero">

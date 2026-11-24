@@ -83,21 +83,34 @@ src/
 ├── components/     # loading, hotbar, music, toast, ikon
 ├── sections/       # Overworld, Cave, DeepDark, Nether, TheEnd, Credits
 ├── admin/          # login, dashboard, editors, komponen form
-├── styles/         # base, layout, sections, admin
-└── lib/supabase.ts
+├── styles/         # base, layout, sections, achievements, admin
+└── lib/            # supabase + achievement data/storage
 
 public/
 ├── fonts/          # Monocraft (SIL OFL)
 ├── textures/       # tekstur 16×16 hasil generate
 ├── img/biomes/     # background AVIF + WebP (1280/1920/2560)
-└── audio/          # musik (di-gitignore)
+└── audio/          # musik (di-track di Git)
 ```
+
+## Achievement book
+
+- Buka lewat slot buku di hotbar atau tekan `E`.
+- Ada **6 hidden artifact** di biome berbeda. Klik item yang berkilau untuk
+  mendapatkan advancement.
+- Progres disimpan di `localStorage` browser dengan key
+  `portfolio-achievements-v1` — tanpa akun, tanpa database, dan hanya berlaku
+  di browser/perangkat itu. Reset tersedia di dalam buku.
+- Kalau keenam artifact ditemukan, akan unlock **Curious Explorer** dan
+  **secret ending** di Credits.
+- Ini terpisah dari tab **Achievements** di Deep Dark, yang berisi prestasi
+  asli/sertifikat dari Supabase.
 
 ## Musik
 
-File ada di `public/audio/` dan **di-gitignore** karena berhak cipta (C418).
-Untuk versi lokal saja. Kalau nanti dipublikasikan, ganti dengan track berlisensi
-atau hapus folder audio — player otomatis menyembunyikan kontrolnya.
+File ada di `public/audio/` dan ikut ter-deploy karena di-track di Git. Track C418
+berhak cipta; kalau nanti ingin lebih aman untuk publikasi, ganti filenya dengan
+audio berlisensi — nama file dan player tidak perlu diubah.
 
 Track dipetakan per biome:
 

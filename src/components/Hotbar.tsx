@@ -1,15 +1,27 @@
 import { SECTIONS } from '../data/sections'
 import { useLang } from '../i18n'
+import { PixelIcon } from './PixelIcon'
 
 type Props = {
   active: number
   progress: number
   onSelect: (index: number) => void
+  onOpenBook: () => void
+  artifactsFound: number
+  artifactTotal: number
 }
 
-export function Hotbar({ active, progress, onSelect }: Props) {
+export function Hotbar({
+  active,
+  progress,
+  onSelect,
+  onOpenBook,
+  artifactsFound,
+  artifactTotal,
+}: Props) {
   const { t } = useLang()
   const percent = Math.round(Math.max(0, Math.min(1, progress)) * 100)
+  const complete = artifactsFound === artifactTotal
 
   return (
     <>
@@ -36,6 +48,24 @@ export function Hotbar({ active, progress, onSelect }: Props) {
               <span className="hotbar__key">{index + 1}</span>
             </button>
           ))}
+
+          <button
+            type="button"
+            className={`hotbar__slot hotbar__slot--book${
+              complete ? ' hotbar__slot--complete' : ''
+            }`}
+            onClick={onOpenBook}
+            aria-label={`${t('achievement_book')} (${artifactsFound}/${artifactTotal})`}
+            aria-keyshortcuts="E"
+          >
+            <PixelIcon name="book" className="hotbar__book-icon" />
+            <span className="hotbar__tip">
+              {t('achievement_book')} <span className="hotbar__tip-key">E</span>
+            </span>
+            <span className="hotbar__count">
+              {artifactsFound}/{artifactTotal}
+            </span>
+          </button>
         </div>
       </nav>
     </>
