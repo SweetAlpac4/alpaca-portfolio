@@ -30,6 +30,7 @@ const en = {
 
   view_projects: 'View projects',
   contact_me: 'Contact me',
+  open_cv: 'Open CV',
   scroll_hint: 'Scroll to explore',
   about_me: 'About me',
   education: 'Education',
@@ -106,6 +107,7 @@ const id: Record<keyof typeof en, string> = {
 
   view_projects: 'Lihat proyek',
   contact_me: 'Hubungi saya',
+  open_cv: 'Buka CV',
   scroll_hint: 'Gulir untuk menjelajah',
   about_me: 'Tentang saya',
   education: 'Pendidikan',

@@ -9,6 +9,7 @@ type Props = {
 
 export function Overworld({ profile, onNavigate }: Props) {
   const { t, pick } = useLang()
+  const cvUrl = profile.resume_url?.trim() || '/cv.pdf'
 
   return (
     <section id="overworld" className="biome biome--overworld">
@@ -33,6 +34,14 @@ export function Overworld({ profile, onNavigate }: Props) {
               >
                 {t('contact_me')}
               </button>
+              <a
+                className="mc-btn mc-btn--ghost"
+                href={cvUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('open_cv')}
+              </a>
             </div>
           </div>
 

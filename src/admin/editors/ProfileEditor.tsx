@@ -91,7 +91,7 @@ export function ProfileEditor() {
             className="input"
             value={(draft.resume_url as string) ?? ''}
             onChange={(event) => set('resume_url', event.target.value)}
-            placeholder="https://…"
+            placeholder="/cv.pdf atau https://…"
           />
         </div>
       </div>

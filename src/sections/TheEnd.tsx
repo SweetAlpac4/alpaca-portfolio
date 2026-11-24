@@ -10,6 +10,7 @@ type Props = {
 
 export function TheEnd({ profile, socials }: Props) {
   const { t } = useLang()
+  const cvUrl = profile.resume_url?.trim() || '/cv.pdf'
 
   return (
     <section id="the-end" className="biome biome--end">
@@ -27,16 +28,14 @@ export function TheEnd({ profile, socials }: Props) {
               <a className="mc-btn" href={`mailto:${profile.email}`}>
                 {t('send_email')}
               </a>
-              {profile.resume_url && (
-                <a
-                  className="mc-btn mc-btn--ghost"
-                  href={profile.resume_url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  CV
-                </a>
-              )}
+              <a
+                className="mc-btn mc-btn--ghost"
+                href={cvUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('open_cv')}
+              </a>
             </div>
           </div>
 
