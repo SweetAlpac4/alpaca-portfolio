@@ -1,14 +1,19 @@
 import { SECTIONS } from '../data/sections'
 import { useLang } from '../i18n'
+import type { RodDef } from '../lib/fishing'
 import { PixelIcon } from './PixelIcon'
+import { RodIcon } from './FishingIcons'
 
 type Props = {
   active: number
   progress: number
   onSelect: (index: number) => void
   onOpenBook: () => void
+  onOpenFishing: () => void
   artifactsFound: number
   artifactTotal: number
+  selectedRod: RodDef
+  fishCaught: number
 }
 
 export function Hotbar({
@@ -16,8 +21,11 @@ export function Hotbar({
   progress,
   onSelect,
   onOpenBook,
+  onOpenFishing,
   artifactsFound,
   artifactTotal,
+  selectedRod,
+  fishCaught,
 }: Props) {
   const { t } = useLang()
   const percent = Math.round(Math.max(0, Math.min(1, progress)) * 100)
@@ -48,6 +56,20 @@ export function Hotbar({
               <span className="hotbar__key">{index + 1}</span>
             </button>
           ))}
+
+          <button
+            type="button"
+            className="hotbar__slot hotbar__slot--rod"
+            onClick={onOpenFishing}
+            aria-label={`${t('fishing_rod')} (${fishCaught})`}
+            aria-keyshortcuts="F"
+          >
+            <RodIcon color={selectedRod.color} className="hotbar__rod-icon" />
+            <span className="hotbar__tip">
+              {t('fishing_rod')} <span className="hotbar__tip-key">F</span>
+            </span>
+            <span className="hotbar__count">{fishCaught}</span>
+          </button>
 
           <button
             type="button"

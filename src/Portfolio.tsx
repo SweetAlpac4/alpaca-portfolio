@@ -11,6 +11,8 @@ import { AdvancementToast } from './components/AdvancementToast'
 import { AchievementBook } from './components/AchievementBook'
 import { AchievementToast } from './components/AchievementToast'
 import { useAchievements } from './components/AchievementProvider'
+import { FishingGame } from './components/FishingGame'
+import { useFishing } from './components/FishingProvider'
 import { ARTIFACTS } from './lib/achievements'
 import { Overworld } from './sections/Overworld'
 import { Cave } from './sections/Cave'
@@ -24,6 +26,7 @@ export function Portfolio() {
   const { data, isLoading } = useContent()
   const { start, setTrack } = useMusic()
   const { unlocked, announcement } = useAchievements()
+  const { selectedRod, state: fishingState } = useFishing()
 
   const content = data ?? fallbackContent
   const worldRef = useRef<HTMLDivElement>(null)
@@ -36,12 +39,14 @@ export function Portfolio() {
   const [toast, setToast] = useState(false)
   const [debug, setDebug] = useState(false)
   const [bookOpen, setBookOpen] = useState(false)
+  const [fishingOpen, setFishingOpen] = useState(false)
   const [viewport, setViewport] = useState({ w: 0, h: 0 })
 
   const artifactsFound = ARTIFACTS.filter((achievement) =>
     unlocked.has(achievement.id),
   ).length
   const closeBook = useCallback(() => setBookOpen(false), [])
+  const closeFishing = useCallback(() => setFishingOpen(false), [])
 
   const goTo = useCallback((index: number) => {
     const el = worldRef.current
@@ -91,11 +96,26 @@ export function Portfolio() {
         return
       }
 
+      if (fishingOpen) {
+        if (event.key === 'f' || event.key === 'F') {
+          event.preventDefault()
+          setFishingOpen(false)
+        }
+        return
+      }
+
       if (bookOpen) {
         if (event.key === 'e' || event.key === 'E') {
           event.preventDefault()
           setBookOpen(false)
         }
+        return
+      }
+
+      if (event.key === 'f' || event.key === 'F') {
+        if (event.metaKey || event.ctrlKey || event.altKey) return
+        event.preventDefault()
+        setFishingOpen(true)
         return
       }
 
@@ -111,7 +131,7 @@ export function Portfolio() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [bookOpen, goTo])
+  }, [bookOpen, fishingOpen, goTo])
 
   useEffect(() => {
     const update = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
@@ -175,8 +195,11 @@ export function Portfolio() {
         progress={progress}
         onSelect={goTo}
         onOpenBook={() => setBookOpen(true)}
+        onOpenFishing={() => setFishingOpen(true)}
         artifactsFound={artifactsFound}
         artifactTotal={ARTIFACTS.length}
+        selectedRod={selectedRod}
+        fishCaught={fishingState.stats.catches}
       />
       <AdvancementToast
         show={toast}
@@ -185,6 +208,7 @@ export function Portfolio() {
       />
       <AchievementToast achievement={announcement} offset={toast} />
       <AchievementBook open={bookOpen} onClose={closeBook} />
+      {fishingOpen && <FishingGame onClose={closeFishing} />}
 
       {debug && (
         <pre className="debug">
@@ -195,8 +219,10 @@ Section: ${active + 1}/${SECTIONS.length}
 Artifacts: ${artifactsFound}/${ARTIFACTS.length}
 Lang: ${lang.toUpperCase()}
 Viewport: ${viewport.w} x ${viewport.h}
+Fish: ${fishingState.stats.catches} caught / ${fishingState.chest.length} in chest
 F3: debug screen on
-E: advancement book`}
+E: advancement book
+F: fishing`}
         </pre>
       )}
     </>

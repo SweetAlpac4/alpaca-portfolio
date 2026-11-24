@@ -83,8 +83,8 @@ src/
 ├── components/     # loading, hotbar, music, toast, ikon
 ├── sections/       # Overworld, Cave, DeepDark, Nether, TheEnd, Credits
 ├── admin/          # login, dashboard, editors, komponen form
-├── styles/         # base, layout, sections, achievements, admin
-└── lib/            # supabase + achievement data/storage
+├── styles/         # base, layout, sections, achievements, fishing, admin
+└── lib/            # supabase, achievement, fishing, dan secret-item storage
 
 public/
 ├── fonts/          # Monocraft (SIL OFL)
@@ -105,6 +105,29 @@ public/
   **secret ending** di Credits.
 - Ini terpisah dari tab **Achievements** di Deep Dark, yang berisi prestasi
   asli/sertifikat dari Supabase.
+
+## Fishing mini-game
+
+- Buka lewat slot pancing di hotbar atau tekan `F`.
+- Alur: **Cast** → tunggu tanda `!` → tekan **Reel** → tahan tombol untuk menarik
+  dan lepas sebelum tension menyentuh batas. Catch progress harus mencapai 100%.
+- Ada 5 pancing: Basic, Sturdy, Lucky, Golden, Prismarine. Pancing baru terbuka
+  dari milestone jumlah tangkapan/spesies; pancing yang sudah terbuka bisa
+  di-equip dari tab **Rods**.
+- Ada 12 catch normal + **1 secret fish** (Echo Fish) dengan rarity mythic.
+  Setiap ikan punya rarity, weight, length, dan size class
+  (Tiny/Small/Average/Large/Trophy).
+- Tab **Chest** menyimpan maksimal **54 ikan**; ikan bisa dilepas (2x klik untuk
+  konfirmasi), dan daftar bisa diurutkan berdasarkan terbaru/terberat.
+- Tab **Journal** menampilkan semua spesies. Spesies yang belum tertangkap
+  tampil sebagai siluet hitam; yang sudah tertangkap tampil berwarna beserta
+  rekor berat/panjang dan jumlah tangkapan.
+- Progres disimpan di `localStorage` dengan key `portfolio-fishing-v1`, terpisah
+  dari achievement book (`portfolio-achievements-v1`).
+- Secret fish hanya bisa muncul kalau browser punya item rahasia `echo_shard`
+  di key `portfolio-secrets-v1`. Belum ada sumber item ini di situs; helper
+  `grantSecretItem('echo_shard')` sudah disiapkan untuk mini-game Deep Dark
+  berikutnya. Selama item itu belum ada, Echo Fish tetap terkunci.
 
 ## Musik
 
