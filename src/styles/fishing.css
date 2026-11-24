@@ -207,8 +207,8 @@
   position: absolute;
   inset: 0 0 42%;
   background:
-    radial-gradient(circle at 78% 24%, rgba(255, 215, 94, 0.11), transparent 18%),
-    linear-gradient(180deg, #081622, #0c2834 68%, #123d49);
+    radial-gradient(circle at 22% 24%, rgba(126, 200, 255, 0.1), transparent 20%),
+    linear-gradient(180deg, #040a16, #081a2c 62%, #0d3140);
 }
 
 .fishing-pond__sky::before,
@@ -226,6 +226,7 @@
     288px 34px 0 rgba(201, 244, 237, 0.5),
     348px 11px 0 rgba(201, 244, 237, 0.4);
   opacity: 0.8;
+  transition: opacity 1.2s ease;
 }
 
 .fishing-pond__sky::before {
@@ -243,17 +244,155 @@
     336px 4px 0 rgba(201, 244, 237, 0.42);
 }
 
+.fishing-pond__night-veil {
+  position: absolute;
+  inset: 0 0 42%;
+  z-index: 1;
+  background: #01030a;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fishing-pond--time-dawn .fishing-pond__night-veil,
+.fishing-pond--time-day .fishing-pond__night-veil,
+.fishing-pond--time-dusk .fishing-pond__night-veil {
+  animation: fishing-night-lift 2.8s ease-out both;
+}
+
+.fishing-pond__dawn-glow {
+  position: absolute;
+  top: 18%;
+  right: -12%;
+  left: -12%;
+  z-index: 1;
+  height: 48%;
+  background: radial-gradient(
+    ellipse at 30% 72%,
+    rgba(255, 154, 84, 0.5),
+    rgba(255, 190, 116, 0.12) 38%,
+    transparent 68%
+  );
+  filter: blur(7px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fishing-pond--time-dawn .fishing-pond__dawn-glow {
+  animation: fishing-dawn-glow 3.6s ease-out both;
+}
+
+.fishing-pond--time-dusk .fishing-pond__dawn-glow {
+  background: radial-gradient(
+    ellipse at 72% 68%,
+    rgba(255, 118, 74, 0.5),
+    rgba(214, 92, 132, 0.12) 42%,
+    transparent 70%
+  );
+  animation: fishing-dawn-glow 3.2s ease-out both;
+}
+
 .fishing-pond__sun {
   position: absolute;
-  left: 16%;
-  top: 15%;
-  width: 28px;
-  height: 28px;
-  background: #ffe7a0;
+  left: 17%;
+  top: 14%;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  background: #d7f1ff;
+  box-shadow:
+    0 0 0 2px #6f95a8,
+    0 0 26px rgba(126, 200, 255, 0.35);
+  opacity: 0.95;
+}
+
+.fishing-pond--time-dawn .fishing-pond__sun {
+  left: 24%;
+  top: 31%;
+  background: #ffbd6b;
+  box-shadow:
+    0 0 0 2px #a95f1f,
+    0 0 34px rgba(255, 154, 84, 0.62);
+  animation: fishing-sunrise 3.6s ease-out both;
+}
+
+.fishing-pond--time-day .fishing-pond__sun {
+  left: 19%;
+  top: 9%;
+  background: #fff3b0;
   box-shadow:
     0 0 0 2px #b9942f,
-    0 0 26px rgba(255, 215, 94, 0.45);
-  opacity: 0.9;
+    0 0 32px rgba(255, 231, 160, 0.58);
+}
+
+.fishing-pond--time-dusk .fishing-pond__sun {
+  right: 20%;
+  left: auto;
+  top: 30%;
+  background: #ff8a4a;
+  box-shadow:
+    0 0 0 2px #8f3c1c,
+    0 0 32px rgba(255, 118, 74, 0.55);
+  animation: fishing-sunset 3.2s ease-out both;
+}
+
+.fishing-pond--time-day .fishing-pond__sky {
+  background:
+    radial-gradient(circle at 78% 18%, rgba(255, 243, 176, 0.28), transparent 24%),
+    linear-gradient(180deg, #2f78b7, #6eb6dc 58%, #b9e2ed);
+}
+
+.fishing-pond--time-dawn .fishing-pond__sky {
+  background:
+    radial-gradient(circle at 26% 78%, rgba(255, 178, 104, 0.42), transparent 38%),
+    linear-gradient(180deg, #1b2140, #4f3f61 48%, #a56263 78%, #df946b);
+}
+
+.fishing-pond--time-dusk .fishing-pond__sky {
+  background:
+    radial-gradient(circle at 76% 76%, rgba(255, 132, 86, 0.38), transparent 38%),
+    linear-gradient(180deg, #171a34, #3c2f55 44%, #7b405e 76%, #c46e5e);
+}
+
+.fishing-pond--time-day .fishing-pond__sky::before,
+.fishing-pond--time-day .fishing-pond__sky::after {
+  opacity: 0;
+}
+
+.fishing-pond--time-dawn .fishing-pond__sky::before,
+.fishing-pond--time-dawn .fishing-pond__sky::after {
+  opacity: 0.22;
+}
+
+.fishing-pond--time-dusk .fishing-pond__sky::before,
+.fishing-pond--time-dusk .fishing-pond__sky::after {
+  opacity: 0.42;
+}
+
+.fishing-pond__time {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.28em 0.52em;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #c9f4ed;
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.fishing-pond__clock {
+  color: #ffe89c;
+}
+
+.fishing-pond__time-phase {
+  color: #9fb3b5;
+  text-transform: uppercase;
 }
 
 .fishing-pond__water {
@@ -266,8 +405,40 @@
       transparent 0 13px,
       rgba(255, 255, 255, 0.035) 13px 14px
     ),
-    linear-gradient(180deg, #15566a, #0d3649 52%, #07202f);
+    linear-gradient(180deg, #0d4354, #082b3c 52%, #041923);
   border-top: 3px solid #06131b;
+}
+
+.fishing-pond--time-dawn .fishing-pond__water {
+  background:
+    linear-gradient(180deg, rgba(255, 164, 96, 0.28), transparent 42%),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 13px,
+      rgba(255, 255, 255, 0.04) 13px 14px
+    ),
+    linear-gradient(180deg, #345b70, #263c58 48%, #101f31);
+}
+
+.fishing-pond--time-day .fishing-pond__water {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 13px,
+      rgba(255, 255, 255, 0.07) 13px 14px
+    ),
+    linear-gradient(180deg, #2d93a6, #17657b 52%, #0a3849);
+}
+
+.fishing-pond--time-dusk .fishing-pond__water {
+  background:
+    linear-gradient(180deg, rgba(255, 116, 74, 0.26), transparent 46%),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 13px,
+      rgba(255, 255, 255, 0.04) 13px 14px
+    ),
+    linear-gradient(180deg, #3b3b61, #262b4a 48%, #0d1427);
 }
 
 .fishing-pond__water::after {
@@ -281,6 +452,15 @@
     transparent 62%
   );
   animation: fishing-water-shift 7s ease-in-out infinite alternate;
+}
+
+.fishing-pond--time-day .fishing-pond__water::after {
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.11) 48%,
+    transparent 62%
+  );
 }
 
 .fishing-ripple {
@@ -303,12 +483,13 @@
   position: absolute;
   left: 50%;
   top: 28%;
-  z-index: 4;
+  z-index: 5;
   width: 12px;
   height: 19px;
   transform: translateX(-50%);
   filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.38));
   animation: fishing-bob 2.6s ease-in-out infinite;
+  transition: left 0.1s linear;
 }
 
 .fishing-bobber__top {
@@ -331,14 +512,14 @@
 }
 
 .fishing-bobber.is-reeling {
-  animation: fishing-bob-shake 0.22s linear infinite;
+  animation: fishing-bob-shake 0.18s linear infinite;
 }
 
 .fishing-bite {
   position: absolute;
   left: 50%;
   top: 4%;
-  z-index: 5;
+  z-index: 6;
   transform: translateX(-50%);
   color: #ffe36e;
   font-size: 3.2rem;
@@ -355,12 +536,59 @@
   position: absolute;
   left: 50%;
   top: 30%;
+  z-index: 4;
   width: 84px;
   height: 26px;
   transform: translateX(-50%);
   border: 2px solid rgba(174, 255, 245, 0.3);
   border-radius: 50%;
   animation: fishing-splash 0.6s ease-out infinite;
+}
+
+.fishing-spray {
+  position: absolute;
+  top: 29%;
+  z-index: 6;
+  width: 4px;
+  height: 4px;
+  background: #d9fffa;
+  box-shadow: 0 0 6px rgba(174, 255, 245, 0.75);
+  opacity: 0;
+  animation: fishing-spray 0.7s ease-out infinite;
+}
+
+.fishing-spray--a {
+  --spray-x: -14px;
+  animation-delay: 0.04s;
+}
+
+.fishing-spray--b {
+  --spray-x: 12px;
+  animation-delay: 0.24s;
+}
+
+.fishing-spray--c {
+  --spray-x: 1px;
+  animation-delay: 0.44s;
+}
+
+.fishing-reel-fish {
+  position: absolute;
+  top: 43%;
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  transform: translateX(-50%);
+  filter: brightness(0.52) saturate(0.7)
+    drop-shadow(0 0 7px rgba(126, 255, 240, 0.34));
+  opacity: 0.62;
+  animation: fishing-fish-fight 0.38s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.fishing-reel-fish svg {
+  width: 100%;
+  height: 100%;
 }
 
 .fishing-pond__dock {
@@ -387,22 +615,64 @@
 }
 
 .fishing-pond__rod {
+  --rod-angle: -38deg;
+  --rod-pull: -44deg;
+  --rod-pull-hard: -47deg;
   position: absolute;
-  right: 16%;
-  top: 5%;
-  z-index: 3;
-  width: 5px;
-  height: 52%;
-  background: linear-gradient(90deg, #9a6332, #5b3519 60%, #3b2110);
+  left: calc(79% - 4px);
+  top: 47%;
+  z-index: 6;
+  width: 8px;
+  height: 68%;
+  background: linear-gradient(90deg, #b47b43, #7a4a24 55%, #3b2110);
   border: 1px solid #1e1007;
-  transform: rotate(28deg);
-  transform-origin: bottom center;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.28);
+  transform: rotate(var(--rod-angle));
+  transform-origin: top center;
+}
+
+.fishing-pond__rod::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -5px;
+  width: 16px;
+  height: 19%;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      #2b170a 0 4px,
+      #5b3519 4px 7px
+    );
+  border: 2px solid #140a04;
+}
+
+.fishing-pond__rod::after {
+  content: '';
+  position: absolute;
+  bottom: 26%;
+  left: -8px;
+  width: 13px;
+  height: 13px;
+  background: #2e3a42;
+  border: 2px solid #0b0f12;
+  border-radius: 50%;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.18);
+}
+
+.fishing-pond__rod.is-reeling {
+  animation: fishing-rod-pull 0.6s ease-in-out infinite alternate;
+}
+
+.fishing-pond__rod.is-reeling.is-holding {
+  animation: fishing-rod-pull-hard 0.26s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.24));
 }
 
 .fishing-pond__line {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 4;
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -410,6 +680,17 @@
   stroke: rgba(210, 255, 249, 0.3);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
+}
+
+.fishing-pond__line.is-reeling {
+  stroke: rgba(235, 255, 252, 0.7);
+  stroke-width: 1.6;
+  animation: fishing-line-taut 0.3s ease-in-out infinite alternate;
+}
+
+.fishing-pond__line.is-reeling.is-holding {
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 2;
 }
 
 .fishing-controls {
@@ -1233,6 +1514,104 @@
   }
 }
 
+@keyframes fishing-night-lift {
+  from {
+    opacity: 0.82;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fishing-dawn-glow {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.9;
+    transform: none;
+  }
+}
+
+@keyframes fishing-sunrise {
+  from {
+    opacity: 0;
+    transform: translateY(86px);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.95;
+    transform: none;
+  }
+}
+
+@keyframes fishing-sunset {
+  from {
+    opacity: 0.9;
+    transform: translateY(-28px);
+  }
+  to {
+    opacity: 0.95;
+    transform: none;
+  }
+}
+
+@keyframes fishing-rod-pull {
+  from {
+    transform: rotate(var(--rod-angle));
+  }
+  to {
+    transform: rotate(var(--rod-pull));
+  }
+}
+
+@keyframes fishing-rod-pull-hard {
+  from {
+    transform: rotate(var(--rod-pull));
+  }
+  to {
+    transform: rotate(var(--rod-pull-hard));
+  }
+}
+
+@keyframes fishing-line-taut {
+  from {
+    stroke-opacity: 0.62;
+  }
+  to {
+    stroke-opacity: 1;
+  }
+}
+
+@keyframes fishing-fish-fight {
+  from {
+    transform: translate(-50%, 4px) rotate(-9deg) scale(0.92);
+  }
+  to {
+    transform: translate(-46%, -4px) rotate(9deg) scale(1.06);
+  }
+}
+
+@keyframes fishing-spray {
+  0% {
+    opacity: 0;
+    transform: translate(0, 4px) scale(0.7);
+  }
+  24% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--spray-x, 0), -18px) scale(0.2);
+  }
+}
+
 @keyframes fishing-pulse {
   from {
     opacity: 0.65;
@@ -1299,7 +1678,10 @@
   }
 
   .fishing-pond__rod {
-    right: 11%;
+    --rod-angle: -26deg;
+    --rod-pull: -30deg;
+    --rod-pull-hard: -32deg;
+    height: 50%;
   }
 
   .fishing-pond__dock {

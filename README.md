@@ -111,6 +111,13 @@ public/
 - Buka lewat slot pancing di hotbar atau tekan `F`.
 - Alur: **Cast** → tunggu tanda `!` → tekan **Reel** → tahan tombol untuk menarik
   dan lepas sebelum tension menyentuh batas. Catch progress harus mencapai 100%.
+- Pemandangan kolam mengikuti jam lokal perangkat: **Malam**, **Fajar**,
+  **Siang**, atau **Senja**. Saat dibuka, ada transisi singkat dari gelap ke
+  fase saat ini; khusus fajar, matahari terbit dengan glow. Jam dan fase tampil
+  di pojok kolam.
+- Pancing digambar di foreground (kanan bawah). Saat menarik, pancing memantul,
+  senar menegang, bobber bergerak ke arah pancing, dan siluet ikan terlihat
+  berjuang di bawah air.
 - Ada 5 pancing: Basic, Sturdy, Lucky, Golden, Prismarine. Pancing baru terbuka
   dari milestone jumlah tangkapan/spesies; pancing yang sudah terbuka bisa
   di-equip dari tab **Rods**.

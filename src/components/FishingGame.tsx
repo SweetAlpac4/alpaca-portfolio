@@ -21,6 +21,7 @@ import {
   rollCatch,
   type CatchRoll,
   type FishCatch,
+  type FishId,
   type RodDef,
 } from '../lib/fishing'
 import { hasSecretItem } from '../lib/secrets'
@@ -30,6 +31,7 @@ import { FishIcon, RodIcon } from './FishingIcons'
 type Tab = 'cast' | 'chest' | 'journal' | 'rods'
 type Phase = 'idle' | 'casting' | 'waiting' | 'bite' | 'reeling' | 'result'
 type EscapeReason = 'late' | 'snap'
+type TimePhase = 'night' | 'dawn' | 'day' | 'dusk'
 type Result =
   | { kind: 'catch'; fish: FishCatch; perfect: boolean }
   | { kind: 'escape'; reason: EscapeReason }
@@ -39,6 +41,21 @@ type Props = {
 }
 
 const EMPTY_SLOTS = Array.from({ length: MAX_CHEST_SIZE }, (_, index) => index)
+
+const TIME_PHASE_KEY = {
+  night: 'time_night',
+  dawn: 'time_dawn',
+  day: 'time_day',
+  dusk: 'time_dusk',
+} as const
+
+function getTimePhase(date: Date): TimePhase {
+  const hour = date.getHours()
+  if (hour >= 5 && hour < 7) return 'dawn'
+  if (hour >= 7 && hour < 17) return 'day'
+  if (hour >= 17 && hour < 19) return 'dusk'
+  return 'night'
+}
 
 export function FishingGame({ onClose }: Props) {
   const { t, pick, lang } = useLang()
@@ -61,6 +78,8 @@ export function FishingGame({ onClose }: Props) {
   const [tension, setTension] = useState(0)
   const [progress, setProgress] = useState(0)
   const [holding, setHolding] = useState(false)
+  const [reelFish, setReelFish] = useState<FishId | null>(null)
+  const [now, setNow] = useState(() => new Date())
   const [message, setMessage] = useState('')
   const [newRods, setNewRods] = useState<RodDef[]>([])
   const [chestSort, setChestSort] = useState<'newest' | 'heaviest'>('newest')
@@ -82,6 +101,11 @@ export function FishingGame({ onClose }: Props) {
   useEffect(() => {
     phaseRef.current = phase
   }, [phase])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   const clearTimers = useCallback(() => {
     for (const timer of timersRef.current) window.clearTimeout(timer)
@@ -148,6 +172,7 @@ export function FishingGame({ onClose }: Props) {
       clearTimers()
       holdingRef.current = false
       setHolding(false)
+      setReelFish(null)
       recordEscape()
       setResult({ kind: 'escape', reason })
       setPhase('result')
@@ -166,6 +191,7 @@ export function FishingGame({ onClose }: Props) {
     clearTimers()
     holdingRef.current = false
     setHolding(false)
+    setReelFish(null)
     const fish: FishCatch = {
       ...roll,
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -201,6 +227,7 @@ export function FishingGame({ onClose }: Props) {
     finishedRef.current = false
     holdingRef.current = false
     setHolding(false)
+    setReelFish(null)
     recordCast()
     setPhase('casting')
 
@@ -228,11 +255,12 @@ export function FishingGame({ onClose }: Props) {
     clearTimers()
     const secretAvailable =
       hasSecretItem('echo_shard') && !state.discovered.echo_fish
-    pendingCatchRef.current = rollCatch(
+    const roll = rollCatch(
       selectedRod,
       secretAvailable,
       Boolean(state.discovered.echo_fish),
     )
+    pendingCatchRef.current = roll
     finishedRef.current = false
     tensionRef.current = 0
     progressRef.current = 0
@@ -240,6 +268,7 @@ export function FishingGame({ onClose }: Props) {
     dangerRef.current = 0
     setTension(0)
     setProgress(0)
+    setReelFish(roll.species)
     setPhase('reeling')
   }, [clearTimers, phase, selectedRod, state.discovered])
 
@@ -401,6 +430,15 @@ export function FishingGame({ onClose }: Props) {
   const selectedRodName = pick(selectedRod.name)
   const caughtSpecies = speciesFound
   const journalPercent = (caughtSpecies / FISH.length) * 100
+  const timePhase = getTimePhase(now)
+  const timeLabel = now.toLocaleTimeString(lang === 'id' ? 'id-ID' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  })
+  const bobberX = phase === 'reeling' ? 50 + progress * 0.22 : 50
+  const lineControlX = (79 + bobberX) / 2
+  const linePath = `M79 47 Q${lineControlX.toFixed(2)} 54 ${bobberX.toFixed(2)} 58`
 
   return (
     <div
@@ -503,9 +541,19 @@ export function FishingGame({ onClose }: Props) {
         <div className="fishing__body">
           {tab === 'cast' && (
             <section className="fishing-cast">
-              <div className={`fishing-pond fishing-pond--${phase}`}>
+              <div
+                className={`fishing-pond fishing-pond--${phase} fishing-pond--time-${timePhase}`}
+              >
                 <div className="fishing-pond__sky" />
+                <div className="fishing-pond__night-veil" />
+                <div className="fishing-pond__dawn-glow" />
                 <div className="fishing-pond__sun" />
+                <div className="fishing-pond__time" aria-hidden="true">
+                  <span className="fishing-pond__clock">{timeLabel}</span>
+                  <span className="fishing-pond__time-phase">
+                    {t(TIME_PHASE_KEY[timePhase])}
+                  </span>
+                </div>
                 <div className="fishing-pond__water">
                   <div className="fishing-ripple fishing-ripple--a" />
                   <div className="fishing-ripple fishing-ripple--b" />
@@ -513,6 +561,7 @@ export function FishingGame({ onClose }: Props) {
                     className={`fishing-bobber${
                       phase === 'bite' ? ' is-bite' : ''
                     }${phase === 'reeling' ? ' is-reeling' : ''}`}
+                    style={{ left: `${bobberX}%` }}
                   >
                     <span className="fishing-bobber__top" />
                     <span className="fishing-bobber__bottom" />
@@ -520,20 +569,51 @@ export function FishingGame({ onClose }: Props) {
                   {phase === 'bite' && (
                     <span className="fishing-bite">!</span>
                   )}
+                  {phase === 'reeling' && reelFish && (
+                    <span
+                      className="fishing-reel-fish"
+                      style={{ left: `${bobberX}%` }}
+                    >
+                      <FishIcon species={reelFish} />
+                    </span>
+                  )}
                   {phase === 'reeling' && (
-                    <span className="fishing-splash" />
+                    <>
+                      <span
+                        className="fishing-splash"
+                        style={{ left: `${bobberX}%` }}
+                      />
+                      <span
+                        className="fishing-spray fishing-spray--a"
+                        style={{ left: `calc(${bobberX}% - 14px)` }}
+                      />
+                      <span
+                        className="fishing-spray fishing-spray--b"
+                        style={{ left: `calc(${bobberX}% + 10px)` }}
+                      />
+                      <span
+                        className="fishing-spray fishing-spray--c"
+                        style={{ left: `calc(${bobberX}% - 2px)` }}
+                      />
+                    </>
                   )}
                 </div>
                 <div className="fishing-pond__dock" />
-                <div className="fishing-pond__rod" />
+                <div
+                  className={`fishing-pond__rod${
+                    phase === 'reeling' ? ' is-reeling' : ''
+                  }${phase === 'reeling' && holding ? ' is-holding' : ''}`}
+                />
                 <svg
-                  className="fishing-pond__line"
+                  className={`fishing-pond__line${
+                    phase === 'reeling' ? ' is-reeling' : ''
+                  }${holding ? ' is-holding' : ''}`}
                   viewBox="0 0 100 100"
                   preserveAspectRatio="none"
                   aria-hidden="true"
                   focusable="false"
                 >
-                  <path d="M83 18 Q67 42 50 57" />
+                  <path d={linePath} />
                 </svg>
               </div>
 
