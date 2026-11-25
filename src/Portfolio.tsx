@@ -15,6 +15,7 @@ import { FishingGame } from './components/FishingGame'
 import { useFishing } from './components/FishingProvider'
 import { useCave } from './components/CaveProvider'
 import { NetherGame } from './components/NetherGame'
+import { DeepDarkGame } from './components/DeepDarkGame'
 import { CaveGame } from './components/CaveGame'
 import { GameMilestones } from './components/GameMilestones'
 import { ARTIFACTS, ACHIEVEMENTS } from './lib/achievements'
@@ -46,6 +47,7 @@ export function Portfolio() {
   const [bookOpen, setBookOpen] = useState(false)
   const [fishingOpen, setFishingOpen] = useState(false)
   const [netherOpen, setNetherOpen] = useState(false)
+  const [deepOpen, setDeepOpen] = useState(false)
   const [caveOpen, setCaveOpen] = useState(false)
   const [viewport, setViewport] = useState({ w: 0, h: 0 })
 
@@ -137,6 +139,7 @@ export function Portfolio() {
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return
       if (target?.isContentEditable) return
       if (!entered || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return
+      if (deepOpen) return
       if (caveOpen) {
         if (event.code === 'KeyC') { event.preventDefault(); setCaveOpen(false) }
         return
@@ -168,6 +171,7 @@ export function Portfolio() {
         return
       }
 
+      if (event.code === 'KeyD' && active === 2) { event.preventDefault(); setDeepOpen(true); return }
       if (event.code === 'KeyN' && active === 3) { event.preventDefault(); openNether(); return }
       if (event.code === 'KeyC' && active === 1) { event.preventDefault(); openCave(); return }
 
@@ -184,12 +188,22 @@ export function Portfolio() {
         return
       }
 
+      if (!event.defaultPrevented && !event.shiftKey) {
+        const forward = event.key === 'ArrowDown' || event.key === 'ArrowRight'
+        const backward = event.key === 'ArrowUp' || event.key === 'ArrowLeft'
+        if (forward || backward) {
+          event.preventDefault()
+          goTo(Math.max(0, Math.min(SECTIONS.length - 1, active + (forward ? 1 : -1))))
+          return
+        }
+      }
+
       const number = Number(event.key)
       if (number >= 1 && number <= SECTIONS.length) goTo(number - 1)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [active, bookOpen, caveOpen, fishingOpen, netherOpen, entered, openCave, openNether, openFishing, goTo])
+  }, [active, bookOpen, deepOpen, caveOpen, fishingOpen, netherOpen, entered, openCave, openNether, openFishing, goTo])
 
   useEffect(() => {
     const update = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
@@ -254,9 +268,10 @@ export function Portfolio() {
         activeBiome={entered ? active : -1}
         onOpenFishing={openFishing}
         onOpenNether={openNether}
+        onOpenDeep={() => setDeepOpen(true)}
         onOpenCave={openCave}
         pickaxeTier={caveState.pickaxe}
-        rodColor={selectedRod.color}
+        rod={selectedRod}
       />
       <MusicControls />
       <Hotbar
@@ -267,12 +282,13 @@ export function Portfolio() {
       <AdvancementToast
         show={toast}
         title={`${t('entering')} ${t(current.labelKey)}`}
-        texture={current.texture}
+        biome={current.id}
       />
       <AchievementToast achievement={announcement} offset={toast} />
       <AchievementBook open={bookOpen} onClose={closeBook} />
       {fishingOpen && <FishingGame onClose={closeFishing} onGoToNether={goToNether} />}
       {netherOpen && <NetherGame onClose={closeNether} onGoToFishing={goToOverworld} />}
+      {deepOpen && <DeepDarkGame onClose={() => setDeepOpen(false)} />}
       {caveOpen && <CaveGame onClose={closeCave} />}
 
       {debug && (

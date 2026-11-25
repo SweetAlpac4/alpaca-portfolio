@@ -1,4 +1,5 @@
-import type { FishId } from '../lib/fishing'
+import { wardenReel } from './wardenReel'
+import type { FishId, RodDef } from '../lib/fishing'
 
 type FishIconProps = {
   species: FishId
@@ -150,11 +151,24 @@ export function FishIcon({ species, className }: FishIconProps) {
 }
 
 type RodIconProps = {
-  color: string
+  rod: Pick<RodDef, 'id' | 'color'>
   className?: string
 }
 
-export function RodIcon({ color, className }: RodIconProps) {
+export function RodIcon({ rod, className }: RodIconProps) {
+  if (rod.id === 'warden') {
+    return <svg viewBox="0 0 32 32" className={`rod-icon ${className ?? ''}`} shapeRendering="crispEdges" aria-hidden="true" focusable="false">
+      <path d="M23 4Q31 6 27 22" fill="none" stroke="#9dcac5" strokeWidth="1"/>
+      <path d="M3 28L14 14 18 6 22 2H26V5H23L21 8 17 16 6 30H3Z" fill="#102430"/>
+      <path d="M5 27L15 14 19 6 22 3H25V4H23L20 7 17 15 6 28Z" fill="#397e7c"/>
+      <path d="M18 8h3v2h-3zM3 27h3v2H3z" fill="#c4c8a5"/>
+      <g transform="translate(4 10)">{wardenReel.map(pixel =>
+        <rect key={pixel.y * 16 + pixel.x} {...pixel} height="1"/>)}</g>
+      <path d="M27 19h2v3h1v3h-2v2h-2v-3h-1v-3h2z" fill="#12363d"/>
+      <path d="M27 21h2v3h-2z" fill="#8dffde"/>
+    </svg>
+  }
+  const color = rod.color
   return (
     <svg
       viewBox="0 0 16 16"

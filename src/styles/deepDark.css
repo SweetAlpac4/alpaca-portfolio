@@ -1,0 +1,52 @@
+.deep-game { margin: auto; width: min(30rem, 95vw); max-height: 94dvh; overflow: auto; color: #d3e8df; background: #111e24; border: 3px solid #456868; padding: clamp(12px,3vw,24px); }
+.deep-game::backdrop { background: #060b12df; }
+.deep-game header { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #345052; padding-bottom:10px; }
+.deep-game small,.deep-meter { color:#86e5d1; }
+.deep-game h2 { font-size:clamp(1rem,4vw,1.4rem); }
+.deep-game section { display:grid; gap:12px; padding-top:14px; }
+.deep-game p,.deep-game ul,.deep-meter { font-size:.8rem; line-height:1.5; }
+.deep-game ul { list-style:none; padding:0; }
+.deep-game li { padding:5px 0; color:#aeb8bf; }
+.deep-game li[data-ready=true] { color:#91e6bd; }
+.deep-game button { font:inherit; background:#243d41; color:#d8ffe9; border:2px solid #507573; padding:7px; cursor:pointer; }
+.deep-game button:disabled { cursor:default; }
+.deep-game section > button:disabled { opacity:.5; }
+.deep-game :focus-visible { outline:2px solid #ffe298; outline-offset:1px; }
+.deep-map,.deep-runes { display:grid; gap:3px; width:min(100%,42dvh); margin:auto; }
+.deep-map { grid-template-columns:repeat(7,1fr); }
+.deep-runes { grid-template-columns:repeat(3,1fr); max-width:220px; }
+.deep-game .deep-tile,.deep-runes button { aspect-ratio:1; padding:0; font-size:1.05rem; }
+.deep-game .deep-tile[data-wall=true] { background:#070e14; border-color:#0b151d; }
+.deep-game .deep-tile.warning { color:#211a0a; background:#c09d55; }
+.deep-game .deep-tile.pulse { color:#fff; background:#973c50; }
+.deep-runes button[aria-pressed=true] { background:#83e0c9; color:#142d31; }
+
+/* A dim sculk chamber, with steady highlights for the pieces that matter. */
+.deep-map {
+  padding: 5px;
+  background: #080e14;
+  border: 1px solid #344951;
+  box-shadow: 0 0 0 3px #10191e, 0 6px 18px #03080b99;
+}
+.deep-map .deep-tile.quiet,
+.deep-map .deep-tile.safe {
+  background: #183037;
+  border-color: #324a50;
+}
+.deep-map .deep-tile[data-wall=true] {
+  background: linear-gradient(145deg, #172329, #0a1118 70%);
+  border-color: #1d292e #0a1218 #090e13 #283338;
+  box-shadow: inset 0 2px #253037;
+}
+.deep-map .deep-tile[data-player=true] {
+  outline: 1px solid #ade3dc;
+  outline-offset: -3px;
+}
+.deep-map .deep-tile[data-shard=true] {
+  color: #b8ffec;
+  background: #203c42;
+  text-shadow: 0 0 8px #60d8c1;
+}
+
+.deep-rod { display: flex; align-items: center; gap: 10px; }
+.deep-rod svg { width: 42px; height: 42px; }

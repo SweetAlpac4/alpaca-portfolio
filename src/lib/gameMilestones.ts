@@ -21,7 +21,7 @@ export function gameMilestones(fishing: FishingState, nether: NetherState, cave:
     ['brew_clean', nether.cleanBrews > 0],
     ['cave_first_ore', cave.totalOres >= 1],
     ['cave_100', cave.totalOres >= 100],
-    ['cave_all_ores', ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond'].every(ore => cave.foundOres.includes(ore as typeof cave.foundOres[number]))],
+    ['cave_all_ores', ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'voidsteel'].every(ore => cave.foundOres.includes(ore as typeof cave.foundOres[number]))],
     ['cave_pickaxe', cave.pickaxe === 'diamond'],
     ['cave_find_diamond', cave.foundOres.includes('diamond')],
     ['cave_combo', cave.bestCombo >= 8],

@@ -199,12 +199,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       "id": "Kolektor Pancing"
     },
     "description": {
-      "en": "Unlock all 5 fishing rods.",
-      "id": "Buka semua 5 pancing."
+      "en": "Unlock all 6 fishing rods.",
+      "id": "Buka semua 6 pancing."
     },
     "hint": {
-      "en": "Unlock all 5 fishing rods.",
-      "id": "Buka semua 5 pancing."
+      "en": "Unlock all 6 fishing rods.",
+      "id": "Buka semua 6 pancing."
     }
   },
   {
@@ -231,12 +231,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       "id": "Gema dari Kedalaman"
     },
     "description": {
-      "en": "Catch the secret Echo Fish using an Echo Shard.",
-      "id": "Tangkap Ikan Gema dengan Echo Shard."
+      "en": "Catch the secret Echo Fish with the Warden Rod.",
+      "id": "Tangkap Ikan Gema dengan Warden Rod."
     },
     "hint": {
-      "en": "Catch the secret Echo Fish using an Echo Shard.",
-      "id": "Tangkap Ikan Gema dengan Echo Shard."
+      "en": "Catch the secret Echo Fish with the Warden Rod.",
+      "id": "Tangkap Ikan Gema dengan Warden Rod."
     },
     "secret": true
   },
@@ -328,12 +328,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       "id": "Kolektor Resep"
     },
     "description": {
-      "en": "Unlock all 4 recipes by completing 5 brews.",
-      "id": "Buka 4 resep dengan menyelesaikan 5 racikan."
+      "en": "Unlock all 5 recipes by completing 8 brews.",
+      "id": "Buka 5 resep dengan menyelesaikan 8 racikan."
     },
     "hint": {
-      "en": "Unlock all 4 recipes by completing 5 brews.",
-      "id": "Buka 4 resep dengan menyelesaikan 5 racikan."
+      "en": "Unlock all 5 recipes by completing 8 brews.",
+      "id": "Buka 5 resep dengan menyelesaikan 8 racikan."
     }
   },
   {
@@ -344,12 +344,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       "id": "Rak Ramuan Lengkap"
     },
     "description": {
-      "en": "Brew all 4 recipes with Good quality or better.",
-      "id": "Racik 4 resep dengan kualitas Bagus atau lebih."
+      "en": "Brew all 5 recipes with Good quality or better.",
+      "id": "Racik 5 resep dengan kualitas Bagus atau lebih."
     },
     "hint": {
-      "en": "Brew all 4 recipes with Good quality or better.",
-      "id": "Racik 4 resep dengan kualitas Bagus atau lebih."
+      "en": "Brew all 5 recipes with Good quality or better.",
+      "id": "Racik 5 resep dengan kualitas Bagus atau lebih."
     }
   },
   {
@@ -383,8 +383,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'cave_all_ores', icon: 'chest',
     title: { en: 'Full Cart', id: 'Gerobak Penuh' },
-    description: { en: 'Discover all 6 cave ores.', id: 'Temukan keenam jenis bijih Cave.' },
-    hint: { en: 'Discover all 6 cave ores.', id: 'Temukan keenam jenis bijih Cave.' },
+    description: { en: 'Discover all 7 cave ores.', id: 'Temukan ketujuh jenis bijih Cave.' },
+    hint: { en: 'Discover all 7 cave ores.', id: 'Temukan ketujuh jenis bijih Cave.' },
   },
   {
     id: 'cave_pickaxe', icon: 'diamond',

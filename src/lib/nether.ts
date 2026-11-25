@@ -7,6 +7,7 @@ export type BrewRecipeId =
   | 'fire_resistance'
   | 'strength'
   | 'luck'
+  | 'resonance'
 
 export type BrewQuality = 'ruined' | 'awkward' | 'good' | 'perfect'
 
@@ -35,6 +36,7 @@ export type NetherState = {
   discovered: Partial<Record<BrewRecipeId, BrewRecord>>
   embers: number
   cleanBrews: number
+  resonance: number
   soulFlame: boolean
 }
 
@@ -85,6 +87,12 @@ export const BREW_RECIPES: BrewRecipe[] = [
       id: 'Kilau langka yang membuat lemparan berikutnya terasa penuh kemungkinan.',
     },
   },
+  {
+    id: 'resonance', difficulty: 3, unlockAt: 8,
+    ingredients: ['ghast_tear', 'nether_quartz', 'blaze_powder'],
+    name: { en: 'Potion of Resonance', id: 'Ramuan Resonansi' },
+    description: { en: 'Binds Voidsteel to an Echo Shard.', id: 'Mengikat Voidsteel dengan Echo Shard.' },
+  },
 ]
 
 export const RECIPE_BY_ID = Object.fromEntries(
@@ -109,6 +117,7 @@ export function createInitialNetherState(): NetherState {
     discovered: {},
     embers: 0,
     cleanBrews: 0,
+    resonance: 0,
     soulFlame: false,
   }
 }
@@ -210,6 +219,7 @@ export function loadNetherState(): NetherState {
       discovered,
       embers: number(parsed.embers),
       cleanBrews: number(parsed.cleanBrews),
+      resonance: number(parsed.resonance),
       soulFlame: parsed.soulFlame === true && number(parsed.perfects) >= 5,
     }
   } catch {
@@ -226,7 +236,7 @@ export function saveNetherState(state: NetherState) {
 }
 
 export function brewReward(recipe: BrewRecipeId, quality: BrewQuality): FishingEffects {
-  if (quality === 'ruined' || quality === 'awkward') return { emberBait: 0, luck: 0 }
+  if (recipe === 'resonance' || quality === 'ruined' || quality === 'awkward') return { emberBait: 0, luck: 0 }
   const casts = (recipe === 'fire_resistance' || recipe === 'luck' ? 8 : 5) + (quality === 'perfect' ? 2 : 0)
   return recipe === 'experience' || recipe === 'fire_resistance'
     ? { emberBait: casts, luck: 0 }
@@ -239,6 +249,7 @@ export function recordBrew(state: NetherState, recipe: BrewRecipeId, score: numb
   const previous = state.discovered[recipe] ?? { brews: 0, perfects: 0, bestScore: 0 }
   return {
     ...state,
+    resonance: state.resonance + Number(recipe === 'resonance' && successful),
     brews: state.brews + 1,
     perfects: state.perfects + (quality === 'perfect' ? 1 : 0),
     bestScore: Math.max(state.bestScore, score),

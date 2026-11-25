@@ -4,6 +4,8 @@ import { RodIcon } from './FishingIcons'
 import { PickaxeIcon } from './OreIcons'
 import type { PickaxeTier } from '../lib/cave'
 
+import type { RodDef } from '../lib/fishing'
+
 type Props = {
   onOpenBook: () => void
   found: number
@@ -11,12 +13,13 @@ type Props = {
   activeBiome: number
   onOpenFishing: () => void
   onOpenNether: () => void
-  rodColor: string
+  rod: RodDef
+  onOpenDeep: () => void
   onOpenCave: () => void
   pickaxeTier: PickaxeTier
 }
 
-export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFishing, onOpenNether, rodColor, onOpenCave, pickaxeTier }: Props) {
+export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFishing, onOpenNether, rod, onOpenDeep, onOpenCave, pickaxeTier }: Props) {
   const { lang, setLang, t } = useLang()
 
   return (
@@ -35,13 +38,16 @@ export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFi
       </button>
       {activeBiome === 0 && (
         <button type="button" className="world-tools__game" onClick={onOpenFishing} aria-label={t('fishing')}>
-          <RodIcon color={rodColor} />
+          <RodIcon rod={rod} />
         </button>
       )}
       {activeBiome === 1 && (
         <button type="button" className="world-tools__game" onClick={onOpenCave} aria-label={t('cave_open')} aria-keyshortcuts="C">
           <PickaxeIcon tier={pickaxeTier} />
         </button>
+      )}
+      {activeBiome === 2 && (
+        <button type="button" className="world-tools__game" aria-label="Silent Steps" onClick={onOpenDeep}><PixelIcon name="sculk" /></button>
       )}
       {activeBiome === 3 && (
         <button type="button" className="world-tools__game world-tools__game--nether" onClick={onOpenNether} aria-label={t('brew_tab')}>

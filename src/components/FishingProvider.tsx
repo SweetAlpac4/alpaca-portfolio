@@ -37,6 +37,8 @@ type FishingContextValue = {
   materialTypesFound: number
   chestFull: boolean
   recordCast: () => FishingEffects
+  claimShard: () => void
+  forgeRod: () => void
   claimStarterKit: () => void
   reserveBrew: (id: string, cost: MaterialBag) => boolean
   settleBrew: (id: string, refund: MaterialBag, reward: FishingEffects) => boolean
@@ -63,6 +65,15 @@ export function FishingProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { saveFishingState(stateRef.current) }, [])
 
+  const claimShard = useCallback(() => {
+    if (!stateRef.current.shardFound) commit({ ...stateRef.current, shardFound: true })
+  }, [commit])
+  const forgeRod = useCallback(() => {
+    const state = stateRef.current
+    if (state.shardFound && !state.rods.includes('warden')) {
+      commit({ ...state, rods: [...state.rods, 'warden'], selectedRod: 'warden' })
+    }
+  }, [commit])
   const recordCast = useCallback(() => {
     const current = stateRef.current
     commit(spendCastEffects(current))
@@ -216,14 +227,15 @@ export function FishingProvider({ children }: { children: ReactNode }) {
 
   const reset = useCallback(() => {
     const { materials, materialsFound, materialCatches, starterClaimed, effects, pendingBrew } = stateRef.current
-    commit({ ...createInitialFishingState(), materials, materialsFound, materialCatches, starterClaimed, effects, pendingBrew })
+    const { shardFound, wardenCasts, rods } = stateRef.current
+    commit({ ...createInitialFishingState(), rods: rods.includes('warden') ? ['basic', 'warden'] : ['basic'], shardFound, wardenCasts, materials, materialsFound, materialCatches, starterClaimed, effects, pendingBrew })
   }, [commit])
 
   const value = useMemo<FishingContextValue>(() => {
     const selectedRod = ROD_BY_ID[state.selectedRod] ?? RODS[0]
     return {
       state,
-      selectedRod,
+      claimShard, forgeRod, selectedRod,
       unlockedRods: RODS.filter((rod) => state.rods.includes(rod.id)),
       speciesFound: speciesCount(state),
       materialTypesFound: state.materialsFound.length,
@@ -241,7 +253,7 @@ export function FishingProvider({ children }: { children: ReactNode }) {
       reset,
     }
   }, [
-    claimStarterKit,
+    claimShard, forgeRod, claimStarterKit,
     reserveBrew,
     settleBrew,
     recordCast,

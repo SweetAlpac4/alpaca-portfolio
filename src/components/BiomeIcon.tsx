@@ -1,7 +1,7 @@
 import type { SectionId } from '../data/sections'
 
-export function BiomeIcon({ name }: { name: SectionId }) {
-  return <svg viewBox="0 0 24 24" shapeRendering="crispEdges" aria-hidden="true" focusable="false">
+export function BiomeIcon({ name, className }: { name: SectionId; className?: string }) {
+  return <svg className={className} viewBox="0 0 24 24" shapeRendering="crispEdges" aria-hidden="true" focusable="false">
     {name === 'overworld' && <>
       <path d="M3 7h18v13H3z" fill="#392b20" /><path d="M4 10h16v9H4z" fill="#765034" />
       <path d="M3 5h18v5H3z" fill="#397b3b" /><path d="M5 4h13v2H5z" fill="#81c758" />

@@ -9,8 +9,8 @@ import { useFishing } from './FishingProvider'
 type Props = { onClose: () => void }
 type Run = RunSummary & { combo: number; durability: number; oresThisRun: number; quartzThisRun: number; glowstoneThisRun: number }
 const initialRun = (tier: PickaxeTier): Run => ({ score: 0, bestCombo: 0, lavaHits: 0, blocks: 0, combo: 0, durability: PICKAXES[tier].durability, oresThisRun: 0, quartzThisRun: 0, glowstoneThisRun: 0 })
-const ORES: OreId[] = ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond']
-const BLOCK_MARK: Record<CaveBlockContent, string> = { stone: '', gravel: 'GR', lava: '!!', coal: 'C', iron: 'Fe', gold: 'Au', redstone: 'Rs', lapis: 'Lp', diamond: 'Di', nether_quartz: 'Qz', glowstone_dust: 'Gl' }
+const ORES: OreId[] = ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'voidsteel']
+const BLOCK_MARK: Record<CaveBlockContent, string> = { voidsteel: 'Vs', stone: '', gravel: 'GR', lava: '!!', coal: 'C', iron: 'Fe', gold: 'Au', redstone: 'Rs', lapis: 'Lp', diamond: 'Di', nether_quartz: 'Qz', glowstone_dust: 'Gl' }
 
 export function CaveGame({ onClose }: Props) {
   const { t } = useLang()
@@ -93,7 +93,7 @@ export function CaveGame({ onClose }: Props) {
       stone: t('cave_stone_hit'), gravel: t('cave_gravel_hit'), lava: t('cave_lava_hit'),
       nether_quartz: `${t('cave_quartz_found')} +${resolution.materialAmount}`,
       glowstone_dust: `${t('cave_glowstone_found')} +${resolution.materialAmount}`,
-      coal: `${t('cave_ore_found')}: ${t('cave_ore_coal')}`, iron: `${t('cave_ore_found')}: ${t('cave_ore_iron')}`,
+      voidsteel: t('cave_ore_voidsteel'), coal: `${t('cave_ore_found')}: ${t('cave_ore_coal')}`, iron: `${t('cave_ore_found')}: ${t('cave_ore_iron')}`,
       gold: `${t('cave_ore_found')}: ${t('cave_ore_gold')}`, redstone: `${t('cave_ore_found')}: ${t('cave_ore_redstone')}`,
       lapis: `${t('cave_ore_found')}: ${t('cave_ore_lapis')}`, diamond: `${t('cave_ore_found')}: ${t('cave_ore_diamond')}`,
     }

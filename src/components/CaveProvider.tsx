@@ -5,6 +5,7 @@ import { useFishing } from './FishingProvider'
 
 type CaveContextValue = {
   state: CaveState
+  spendVoidsteel: () => void
   addOre: (ore: OreId, amount?: number) => void
   addMaterial: (material: MaterialId, amount: number) => void
   finishRun: (summary: RunSummary) => void
@@ -27,13 +28,18 @@ export function CaveProvider({ children }: { children: ReactNode }) {
     commit(addMaterialToState(current.current, material, amount))
   }, [addMaterials, commit])
   const finishRun = useCallback((summary: RunSummary) => commit(applyRunSummary(current.current, summary)), [commit])
+  const spendVoidsteel = useCallback(() => {
+    const state = current.current
+    if (state.ores.voidsteel < 1) return
+    commit({ ...state, ores: { ...state.ores, voidsteel: state.ores.voidsteel - 1 } })
+  }, [commit])
   const upgrade = useCallback(() => {
     const next = upgradePickaxe(current.current)
     if (!next) return false
     commit(next)
     return true
   }, [commit])
-  const value = useMemo(() => ({ state, addOre, addMaterial, finishRun, upgrade }), [state, addOre, addMaterial, finishRun, upgrade])
+  const value = useMemo(() => ({ spendVoidsteel, state, addOre, addMaterial, finishRun, upgrade }), [spendVoidsteel, state, addOre, addMaterial, finishRun, upgrade])
   return <CaveContext.Provider value={value}>{children}</CaveContext.Provider>
 }
 export function useCave() {

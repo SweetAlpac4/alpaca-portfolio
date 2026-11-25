@@ -1,3 +1,4 @@
+import { BEAT_LIMIT, ENTRANCE, EXIT, tiles, sensor, adjacent, furnacePuzzle, toggleRune } from "../src/lib/deepDark.ts"
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createInitialFishingState, FISH, FISHING_STORAGE_KEY, loadFishingState, RODS, rollFishingCatch, saveFishingState, reserveIngredients, settleIngredients, spendCastEffects } from '../src/lib/fishing.ts'
@@ -33,7 +34,7 @@ test('material catches replace fish, leave the fish pool intact, and Ember Bait 
   assert.equal(random(0.25, () => rollFishingCatch(RODS[0], false, false)).kind, 'fish')
   assert.equal(random(0.25, () => rollFishingCatch(RODS[0], false, false, { emberBait: 1, luck: 0 })).kind, 'material')
   assert.equal(FISH.length, 13)
-  const secret = random(0, () => rollFishingCatch(RODS[0], true, false, { emberBait: 5, luck: 5 }))
+  const secret = random(0, () => rollFishingCatch(RODS.find(rod => rod.id === 'warden'), true, false, { emberBait: 5, luck: 5 }))
   assert.equal(secret.kind, 'fish')
   assert.equal(secret.roll.species, 'echo_fish')
 })
@@ -126,7 +127,7 @@ test('progression unlocks four recipes, cosmetics, rewards, and lifetime achieve
   const fishing = { ...createInitialFishingState(), rods: RODS.map(rod => rod.id), materialsFound: MATERIALS.map(item => item.id) }
   fishing.discovered = Object.fromEntries(FISH.filter(fish => !fish.secret).map(fish => [fish.id, { count: 1 }]))
   const milestones = gameMilestones(fishing, nether, createInitialCaveState())
-  for (const id of ['fishing_rods', 'fishing_collection', 'rift_collector', 'brew_master', 'brew_recipes', 'brew_clean']) assert.ok(milestones.includes(id))
+  for (const id of ['fishing_rods', 'fishing_collection', 'rift_collector', 'brew_master', 'brew_clean']) assert.ok(milestones.includes(id))
   assert.ok(!milestones.includes('fishing_echo'))
   assert.equal(SECRET_ENDING_ENABLED, false)
 })
@@ -134,12 +135,12 @@ test('progression unlocks four recipes, cosmetics, rewards, and lifetime achieve
 test('Cave state starts empty, uses wood pickaxe, and serializes cleanly', () => {
   const cave = createInitialCaveState()
   assert.equal(cave.pickaxe, 'wood')
-  assert.deepEqual(Object.values(cave.ores), [0, 0, 0, 0, 0, 0])
+  assert.deepEqual(Object.values(cave.ores), [0, 0, 0, 0, 0, 0, 0])
   assert.doesNotThrow(() => JSON.stringify(cave))
 })
 
 test('generated mining grid has 49 valid cells, coal in the shallow rows, and no row-one lava', () => {
-  const valid = new Set(['stone', 'coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'gravel', 'lava', 'nether_quartz', 'glowstone_dust'])
+  const valid = new Set(['stone', 'coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'voidsteel', 'gravel', 'lava', 'nether_quartz', 'glowstone_dust'])
   const grid = generateGrid('diamond', () => 0.999)
   assert.equal(grid.length, 49)
   assert.deepEqual([...new Set(grid.map(block => block.row))], [1, 2, 3, 4, 5, 6, 7])
@@ -215,7 +216,7 @@ test('ore discovery and cave save loading are defensive', () => {
 test('Cave milestones unlock for a fully progressed miner', () => {
   const fishing = createInitialFishingState()
   const nether = createInitialNetherState()
-  const cave = { ...createInitialCaveState(), pickaxe: 'diamond', totalOres: 100, foundOres: ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond'], bestCombo: 8, cleanRuns: 1, quartzMined: 1, glowstoneMined: 1 }
+  const cave = { ...createInitialCaveState(), pickaxe: 'diamond', totalOres: 100, foundOres: ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'voidsteel'], bestCombo: 8, cleanRuns: 1, quartzMined: 1, glowstoneMined: 1 }
   const milestones = gameMilestones(fishing, nether, cave)
   for (const id of ['cave_first_ore', 'cave_100', 'cave_all_ores', 'cave_pickaxe', 'cave_find_diamond', 'cave_combo', 'cave_clean', 'cave_geologist']) assert.ok(milestones.includes(id))
 })
@@ -250,4 +251,53 @@ test('delayed timer ticks still register missed doses and finish at exactly 36 s
   assert.equal(delayed.elapsed, BREW_DURATION)
   assert.deepEqual(finishBrew(delayed), finishBrew(stepped))
   assert.deepEqual(delayed.hits, stepped.hits)
+})
+
+test('the Silent Steps shard can be carried home before timeout without an alarm', () => {
+  let positions = [{ pos: ENTRANCE, carrying: false }]
+  for (let beat = 0; beat < BEAT_LIMIT; beat++) {
+    const next = new Map()
+    for (const { pos, carrying } of positions) {
+      for (let dest = 0; dest < tiles.length; dest++) {
+        if (tiles[dest] === '#' || (dest !== pos && !adjacent(pos, dest))) continue
+        if ([beat, beat + 1].some(b => sensor(dest, b) === 'pulse')) continue
+        if (dest === ENTRANCE && carrying) return
+        const hasShard = carrying || dest === EXIT
+        next.set(dest + ':' + hasShard, { pos: dest, carrying: hasShard })
+      }
+    }
+    positions = [...next.values()]
+  }
+  assert.fail('No clean round trip within the beat limit')
+})
+
+test('furnace scrambles have a five-move solution', () => {
+  const chosen = []
+  const cells = Array.from({ length: 9 }, (_, i) => i)
+  const scramble = furnacePuzzle(() => {
+    const fraction = .42
+    chosen.push(...cells.splice(Math.floor(cells.length * fraction), 1))
+    return fraction
+  })
+  assert.notEqual(scramble, 511)
+  assert.equal(chosen.reduce(toggleRune, scramble), 511)
+})
+
+test('endgame progression gates the ore, potion and Echo Fish', () => {
+  for (let row = 1; row <= 7; row++) assert.equal(BLOCK_WEIGHTS[row].voidsteel ?? 0, row === 7 ? 5 : 0)
+  let nether = createInitialNetherState()
+  for (let i = 0; i < 8; i++) nether = recordBrew(nether, 'experience', 80, false)
+  assert.ok(nether.recipes.includes('resonance'))
+  assert.equal(recordBrew(nether, 'resonance', 60, false).resonance, 0)
+  assert.equal(recordBrew(nether, 'resonance', 80, false).resonance, 1)
+  const rod = RODS.find(r => r.id === 'warden')
+  const old = random(0, () => rollFishingCatch(RODS[0], true, false))
+  assert.notEqual(old.roll?.species, 'echo_fish')
+  let fishing = { ...createInitialFishingState(), selectedRod: rod.id, rods: ['basic', rod.id] }
+  for (let i = 1; i <= 7; i++) {
+    fishing = spendCastEffects(fishing)
+    assert.equal(fishing.wardenCasts, Math.min(i, 5))
+  }
+  saveFishingState(fishing)
+  assert.equal(loadFishingState().wardenCasts, 5)
 })

@@ -140,7 +140,7 @@ export function NetherGame({ onClose, onGoToFishing }: Props) {
                   <div className="nether-ingredients">
                     {recipe.ingredients.map((id, i) => <div key={`${id}-${i}`} className={materialCount(fishing.materials, id) > 0 ? '' : 'is-missing'} title={pick(MATERIAL_BY_ID[id].name)}><MaterialIcon material={id} /><span>{pick(MATERIAL_BY_ID[id].name)}</span><strong>{materialCount(fishing.materials, id)}/1</strong></div>)}
                   </div>
-                  <p className="nether-reward">{reward.emberBait ? `${t('ember_bait')} +${reward.emberBait}` : `${t('luck_potion')} +${reward.luck}`} {t('brew_casts')}</p>
+                  <p className="nether-reward">{recipeId === 'resonance' ? `+1 ${pick(recipe.name)}` : `${reward.emberBait ? t('ember_bait') : t('luck_potion')} +${reward.emberBait || reward.luck} ${t('brew_casts')}`}</p>
                   <p className="nether-help">{t('brew_help')}</p>
                   {!fishing.starterClaimed && <button className="nether-button nether-button--secondary" onClick={claimStarterKit}>{t('brew_starter')}</button>}
                   {message && <p role="alert" className="nether-warning">{message}</p>}
@@ -173,7 +173,7 @@ export function NetherGame({ onClose, onGoToFishing }: Props) {
                   <p className="nether-eyebrow">{pick(recipe.name)}</p>
                   <h3>{qualityLabel}</h3><strong className="nether-result__score">{result.score}<small>/100</small></strong>
                   <p>{result.hits}/{BREW_STEPS} {t('brew_hits')} · {t('brew_combo')} ×{result.bestCombo}</p>
-                  <p className="nether-reward">{result.quality === 'ruined' ? t('brew_refund_all') : result.quality === 'awkward' ? t('brew_refund_one') : `${reward.emberBait ? t('ember_bait') : t('luck_potion')} +${reward.emberBait || reward.luck} ${t('brew_casts')}`}</p>
+                  <p className="nether-reward">{result.quality === 'ruined' ? t('brew_refund_all') : result.quality === 'awkward' ? t('brew_refund_one') : recipeId === 'resonance' ? `+1 ${pick(recipe.name)}` : `${reward.emberBait ? t('ember_bait') : t('luck_potion')} +${reward.emberBait || reward.luck} ${t('brew_casts')}`}</p>
                   {result.quality === 'perfect' && <p className="nether-reward">+1 {t('nether_ember')}</p>}
                   {BREW_RECIPES.filter(item => item.unlockAt === state.brews).map(item => <p key={item.id} className="nether-reward">{t('brew_recipe_unlocked')}: {pick(item.name)}</p>)}
                   <button className="nether-button" onClick={() => { setResult(null); publish(createBrewSession()) }}>{t('brew_again')}</button>
@@ -190,7 +190,7 @@ export function NetherGame({ onClose, onGoToFishing }: Props) {
             <div className="nether-bag__grid">
               {MATERIALS.map(item => <article key={item.id} className="nether-material"><MaterialIcon material={item.id} /><div><h4>{pick(item.name)}</h4><p>{pick(item.description)}</p><small>{fishing.materialsFound.includes(item.id) ? t('found') : t('material_locked_hint')}</small></div><strong>×{materialCount(fishing.materials, item.id)}</strong></article>)}
             </div>
-            <div className="nether-effects"><p>{t('ember_bait')}: <strong>{fishing.effects.emberBait}</strong> {t('brew_casts')}</p><p>{t('luck_potion')}: <strong>{fishing.effects.luck}</strong> {t('brew_casts')}</p><p>{t('nether_ember')}: <strong>{state.embers}</strong></p></div>
+            <div className="nether-effects"><p>{pick(RECIPE_BY_ID.resonance.name)}: <strong>{state.resonance}</strong></p><p>{t('ember_bait')}: <strong>{fishing.effects.emberBait}</strong> {t('brew_casts')}</p><p>{t('luck_potion')}: <strong>{fishing.effects.luck}</strong> {t('brew_casts')}</p><p>{t('nether_ember')}: <strong>{state.embers}</strong></p></div>
             <p className="nether-help">{t('brew_effects_help')}</p>
             <button className="nether-button" onClick={onGoToFishing}>{t('brew_go_overworld')}</button>
           </section>}

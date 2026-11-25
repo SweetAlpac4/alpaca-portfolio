@@ -105,7 +105,7 @@ public/
 - Keenam artifact membuka **Curious Explorer**. **Secret ending dinonaktifkan**
   lewat `src/lib/features.ts` sampai semua biome punya minigame. Progres artefak
   lama tetap disimpan.
-- Ada 13 milestone game: tangkapan pertama/25 tangkapan, semua 5 pancing,
+- Ada 13 milestone game: tangkapan pertama/25 tangkapan, semua 6 pancing,
   12 tangkapan reguler, Echo Fish, bahan Rift pertama/6 jenis bahan, racikan
   berhasil pertama, Perfect pertama/5 Perfect, semua resep terbuka/berhasil
   diracik, dan 9 takaran tepat tanpa overheat.
@@ -124,7 +124,7 @@ public/
 - Pancing digambar di foreground (kanan bawah). Saat menarik, pancing memantul,
   senar menegang, bobber bergerak ke arah pancing, dan siluet ikan terlihat
   berjuang di bawah air.
-- Ada 5 pancing: Basic, Sturdy, Lucky, Golden, Prismarine. Pancing baru terbuka
+- Ada 5 pancing biasa: Basic, Sturdy, Lucky, Golden, Prismarine. Pancing baru terbuka
   dari milestone jumlah tangkapan/spesies; pancing yang sudah terbuka bisa
   di-equip dari tab **Rods**.
 - Ada 12 catch normal + **1 secret fish** (Echo Fish) dengan rarity mythic.
@@ -137,11 +137,11 @@ public/
   rekor berat/panjang dan jumlah tangkapan.
 - Progres disimpan di `localStorage` dengan key `portfolio-fishing-v1`, terpisah
   dari achievement book (`portfolio-achievements-v1`).
-- Secret fish hanya bisa muncul kalau browser punya item rahasia `echo_shard`
-  di key `portfolio-secrets-v1`. Belum ada sumber item ini di situs; helper
-  `grantSecretItem('echo_shard')` sudah disiapkan untuk mini-game Deep Dark
-  berikutnya. Selama item itu belum ada, Echo Fish tetap terkunci.
+- Warden Rod ditempa di Deep Dark. Peluang Echo Fish pada lima lemparan pertama dengan rod ini adalah 20%, 40%, 60%, 80%, dan 100%. Setelah lemparan kelima, gigitan dijamin sampai Echo Fish berhasil ditangkap.
 
+## Deep Dark
+
+Buka ikon sculk di sebelah buku atau tekan D di Deep Dark. Di Silent Steps, ambil Echo Shard dan kembali ke pintu masuk sebelum waktu habis. Dua gelombang yang mengenai pemain membangunkan Warden. Bawa shard, satu Voidsteel (5% per blok Cave baris 7), satu Ramuan Resonansi, dan keenam artefak ke tungku. Aktifkan Api Jiwa di Nether setelah lima racikan Sempurna. Nyalakan semua rune dalam lima langkah untuk menempa Warden Rod. Mengulang puzzle menyimpan bahan.
 
 ## Nether Brewmaster
 
@@ -166,7 +166,7 @@ public/
   Miss mengakhiri kombo; klik berulang dalam takaran yang sama tidak dihitung.
 - Tutup/reload sebelum selesai: **refund semua bahan**. Gagal juga refund
   semua bahan, Canggung refund bahan pertama. Ronde selesai membuka resep
-  setelah total 1, 3, dan 5 ronde, termasuk percobaan gagal.
+  setelah total 1, 3, 5, dan 8 ronde, termasuk percobaan gagal.
 
 | Resep | Terbuka setelah | Hadiah kualitas Bagus |
 | --- | --- | --- |
@@ -174,6 +174,7 @@ public/
 | Tahan Api | 1 ronde | Umpan Bara, 8 lemparan |
 | Kekuatan | 3 ronde | Ramuan Hoki, 5 lemparan |
 | Keberuntungan | 5 ronde | Ramuan Hoki, 8 lemparan |
+| Resonansi | 8 ronde | 1 Ramuan Resonansi untuk tungku |
 
 - Sempurna menambah 2 lemparan bonus dan 1 **Bara Nether**. Lima Sempurna
   membuka title Brewmaster dan toggle kosmetik **Api Jiwa**. Bara Nether

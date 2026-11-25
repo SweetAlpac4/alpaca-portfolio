@@ -124,7 +124,7 @@ const en = {
   brew_again: "Choose next brew",
   brew_return_fishing: "Back to fishing",
   brew_exit_refund: "Leave early: all ingredients are returned.",
-  brew_progress_hint: "Finish 1, 3 and 5 brews to unlock recipes. Good or better earns fishing boosts.",
+  brew_progress_hint: "Recipes unlock after 1, 3, 5 and 8 brews. Brew Resonance at Good quality or better for the furnace.",
   brew_pause_hint: "Switching browser tabs pauses the brew.",
   brew_soul_flame: "Soul Flame",
   brew_effects_help: "Boosts activate automatically and stack by number of casts. Ember Bait raises material odds; Potion of Luck raises rare fish odds. Nether Embers are collectibles for a future update.",
@@ -167,6 +167,7 @@ const en = {
   cave_tier_stone: 'Stone',
   cave_tier_iron: 'Iron',
   cave_tier_diamond: 'Diamond',
+  cave_ore_voidsteel: 'Voidsteel',
   cave_ore_coal: 'Coal',
   cave_ore_iron: 'Iron',
   cave_ore_gold: 'Gold',
@@ -276,7 +277,7 @@ const en = {
   reset_fishing_confirm: 'Click again to reset fishing',
   secret_fish_hint:
     'Only bites for those who carry something from the Deep Dark.',
-  secret_requires: 'Requires Echo Shard from the Deep Dark.',
+  secret_requires: 'Craft the Warden Rod at the Deep Dark furnace.',
   unknown: '???',
   fishing_locked_hint:
     'Keep casting — every cast can bring something new.',
@@ -424,7 +425,7 @@ const id: Record<keyof typeof en, string> = {
   brew_again: "Pilih racikan berikutnya",
   brew_return_fishing: "Kembali mancing",
   brew_exit_refund: "Keluar sebelum selesai: semua bahan dikembalikan.",
-  brew_progress_hint: "Selesaikan 1, 3, dan 5 racikan untuk membuka resep. Kualitas Bagus atau lebih memberi bonus mancing.",
+  brew_progress_hint: "Resep terbuka setelah 1, 3, 5, dan 8 racikan. Racik Resonansi berkualitas Bagus atau lebih untuk tungku.",
   brew_pause_hint: "Pindah tab browser menjeda racikan.",
   brew_soul_flame: "Api Jiwa",
   brew_effects_help: "Bonus aktif otomatis dan jumlah lemparannya bisa ditumpuk. Umpan Bara menaikkan peluang bahan; Ramuan Hoki menaikkan peluang ikan langka. Bara Nether adalah koleksi untuk update berikutnya.",
@@ -467,6 +468,7 @@ const id: Record<keyof typeof en, string> = {
   cave_tier_stone: 'Batu',
   cave_tier_iron: 'Besi',
   cave_tier_diamond: 'Diamond',
+  cave_ore_voidsteel: 'Voidsteel',
   cave_ore_coal: 'Batu bara',
   cave_ore_iron: 'Besi',
   cave_ore_gold: 'Emas',
@@ -576,7 +578,7 @@ const id: Record<keyof typeof en, string> = {
   reset_fishing_confirm: 'Klik lagi untuk reset mancing',
   secret_fish_hint:
     'Hanya menggigit bagi yang membawa sesuatu dari Deep Dark.',
-  secret_requires: 'Butuh Echo Shard dari Deep Dark.',
+  secret_requires: 'Rakit Warden Rod di tungku Deep Dark.',
   unknown: '???',
   fishing_locked_hint:
     'Terus lempar — setiap lemparan bisa membawa sesuatu yang baru.',

@@ -1,6 +1,6 @@
 import type { MaterialId } from './materials'
 
-export type OreId = 'coal' | 'iron' | 'gold' | 'redstone' | 'lapis' | 'diamond'
+export type OreId = 'voidsteel' | 'coal' | 'iron' | 'gold' | 'redstone' | 'lapis' | 'diamond'
 export type PickaxeTier = 'wood' | 'stone' | 'iron' | 'diamond'
 export type CaveBlockContent = OreId | 'stone' | 'gravel' | 'lava' | 'nether_quartz' | 'glowstone_dust'
 export type CaveBlock = { id: string; row: number; col: number; content: CaveBlockContent; mined: boolean }
@@ -32,8 +32,8 @@ export type MineResolution = {
 }
 
 export const CAVE_STORAGE_KEY = 'portfolio-cave-v1'
-const ORE_IDS: OreId[] = ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond']
-const ZERO_ORES: Record<OreId, number> = { coal: 0, iron: 0, gold: 0, redstone: 0, lapis: 0, diamond: 0 }
+const ORE_IDS: OreId[] = ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'voidsteel']
+const ZERO_ORES: Record<OreId, number> = { coal: 0, iron: 0, gold: 0, redstone: 0, lapis: 0, diamond: 0, voidsteel: 0 }
 const TIER_ORDER: PickaxeTier[] = ['wood', 'stone', 'iron', 'diamond']
 export const PICKAXES: Record<PickaxeTier, { tier: PickaxeTier; durability: number; maxRow: number; label: string; cost: Partial<Record<OreId, number>> }> = {
   wood: { tier: 'wood', durability: 22, maxRow: 3, label: 'cave_tier_wood', cost: {} },
@@ -42,7 +42,7 @@ export const PICKAXES: Record<PickaxeTier, { tier: PickaxeTier; durability: numb
   diamond: { tier: 'diamond', durability: 38, maxRow: 7, label: 'cave_tier_diamond', cost: { diamond: 2, iron: 10, coal: 16 } },
 }
 export const ORE_VALUES: Record<OreId | 'nether_quartz' | 'glowstone_dust', number> = {
-  coal: 2, iron: 4, gold: 6, redstone: 5, lapis: 8, diamond: 25, nether_quartz: 10, glowstone_dust: 12,
+  voidsteel: 35, coal: 2, iron: 4, gold: 6, redstone: 5, lapis: 8, diamond: 25, nether_quartz: 10, glowstone_dust: 12,
 }
 export const DEPTH_MULTIPLIER: Record<number, number> = { 1: 1, 2: 1, 3: 1.5, 4: 1.5, 5: 2, 6: 2, 7: 3 }
 export const BLOCK_WEIGHTS: Record<number, Partial<Record<CaveBlockContent, number>>> = {
@@ -52,7 +52,7 @@ export const BLOCK_WEIGHTS: Record<number, Partial<Record<CaveBlockContent, numb
   4: { stone: 44, coal: 10, iron: 14, gold: 6, redstone: 6, lapis: 4, diamond: 1.5, nether_quartz: 5, gravel: 6, lava: 3.5 },
   5: { stone: 44, coal: 10, iron: 14, gold: 6, redstone: 6, lapis: 4, diamond: 1.5, nether_quartz: 5, gravel: 6, lava: 3.5 },
   6: { stone: 35, coal: 5, iron: 10, gold: 8, redstone: 7, lapis: 6, diamond: 3, nether_quartz: 6, glowstone_dust: 3, gravel: 8, lava: 9 },
-  7: { stone: 28, coal: 4, iron: 9, gold: 9, redstone: 8, lapis: 7, diamond: 5, nether_quartz: 6, glowstone_dust: 8, gravel: 7, lava: 9 },
+  7: { voidsteel: 5, stone: 23, coal: 4, iron: 9, gold: 9, redstone: 8, lapis: 7, diamond: 5, nether_quartz: 6, glowstone_dust: 8, gravel: 7, lava: 9 },
 }
 
 export function createInitialCaveState(): CaveState {

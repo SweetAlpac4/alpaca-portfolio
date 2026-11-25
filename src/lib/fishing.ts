@@ -1,3 +1,4 @@
+import { hasSecretItem } from './secrets.ts'
 import type { Localized } from '../data/types'
 import type { TranslationKey } from '../i18n'
 import {
@@ -7,7 +8,7 @@ import {
   type MaterialId,
 } from './materials.ts'
 
-export type RodId = 'basic' | 'sturdy' | 'lucky' | 'golden' | 'prismarine'
+export type RodId = 'basic' | 'sturdy' | 'lucky' | 'golden' | 'prismarine' | 'warden'
 export type FishId =
   | 'old_boot'
   | 'kelp'
@@ -55,7 +56,7 @@ export type FishDef = {
   minLength: number
   maxLength: number
   secret?: boolean
-  requires?: 'echo_shard'
+  requires?: 'warden'
 }
 
 export type CatchRoll = {
@@ -99,6 +100,8 @@ export type FishingState = {
   version: 1
   rods: RodId[]
   selectedRod: RodId
+  shardFound: boolean
+  wardenCasts: number
   chest: FishCatch[]
   discovered: Partial<Record<FishId, FishRecord>>
   materials: MaterialBag
@@ -192,6 +195,13 @@ export const RODS: RodDef[] = [
     reelSpeed: 30,
     luck: 0.8,
     requirement: { metric: 'species', count: 10 },
+  },
+  {
+    id: 'warden', tier: 6, color: '#80ffe3',
+    name: { en: 'Warden Rod', id: 'Warden Rod' },
+    description: { en: 'Forged in the Deep Dark. Echo Fish bites by cast five.', id: 'Ditempa di Deep Dark. Ikan Gema menggigit paling lambat di lemparan kelima.' },
+    unlockText: { en: 'Solve the Deep Dark furnace.', id: 'Pecahkan teka-teki tungku Deep Dark.' },
+    biteWindow: 1500, tensionRate: 24, reelSpeed: 38, luck: 1.25,
   },
 ]
 
@@ -356,7 +366,7 @@ export const FISH: FishDef[] = [
     id: 'echo_fish',
     rarity: 'mythic',
     secret: true,
-    requires: 'echo_shard',
+    requires: 'warden',
     name: { en: 'Echo Fish', id: 'Ikan Gema' },
     description: {
       en: 'It hums with a sound from below bedrock.',
@@ -406,7 +416,7 @@ export function createInitialFishingState(): FishingState {
   return {
     version: 1,
     rods: ['basic'],
-    selectedRod: 'basic',
+    selectedRod: 'basic', shardFound: false, wardenCasts: 0,
     chest: [],
     discovered: {},
     materials: {},
@@ -458,7 +468,7 @@ export function rollFishingCatch(
   secretAlreadyCaught: boolean,
   effects: FishingEffects = { emberBait: 0, luck: 0 },
 ): FishingRoll {
-  if (hasSecretBait && !secretAlreadyCaught) {
+  if (rod.id === 'warden' && hasSecretBait && !secretAlreadyCaught) {
     return { kind: 'fish', roll: rollForFish(FISH_BY_ID.echo_fish) }
   }
 
@@ -482,7 +492,7 @@ export function rollCatch(
   hasSecretBait: boolean,
   secretAlreadyCaught: boolean,
 ): CatchRoll {
-  if (hasSecretBait && !secretAlreadyCaught) {
+  if (rod.id === 'warden' && hasSecretBait && !secretAlreadyCaught) {
     return rollForFish(FISH_BY_ID.echo_fish)
   }
 
@@ -538,6 +548,7 @@ function sizeFromPercentile(percentile: number): FishSize {
 
 export function loadFishingState(): FishingState {
   const initial = createInitialFishingState()
+  initial.shardFound = hasSecretItem('echo_shard')
   try {
     const raw = window.localStorage.getItem(FISHING_STORAGE_KEY)
     if (!raw) return initial
@@ -610,7 +621,7 @@ export function loadFishingState(): FishingState {
     return {
       version: 1,
       rods,
-      selectedRod,
+      selectedRod, shardFound: parsed.shardFound === true || initial.shardFound, wardenCasts: Math.min(5, safeCount(parsed.wardenCasts)),
       chest,
       discovered,
       materials,
@@ -693,6 +704,7 @@ export function spendCastEffects(state: FishingState): FishingState {
   return {
     ...state,
     effects: { emberBait: Math.max(0, state.effects.emberBait - 1), luck: Math.max(0, state.effects.luck - 1) },
+    wardenCasts: Math.min(5, state.wardenCasts + Number(state.selectedRod === 'warden' && !state.discovered.echo_fish)),
     stats: { ...state.stats, casts: state.stats.casts + 1 },
   }
 }

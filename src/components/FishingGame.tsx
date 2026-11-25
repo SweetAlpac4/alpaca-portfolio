@@ -29,7 +29,6 @@ import {
   materialCount,
   type MaterialId,
 } from '../lib/materials'
-import { hasSecretItem } from '../lib/secrets'
 import { useFishing } from './FishingProvider'
 import { FishIcon, RodIcon } from './FishingIcons'
 import { MaterialIcon } from './MaterialIcons'
@@ -280,7 +279,7 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
     if (phase !== 'bite') return
     clearTimers()
     const secretAvailable =
-      hasSecretItem('echo_shard') && !state.discovered.echo_fish
+      selectedRod.id === 'warden' && !state.discovered.echo_fish && Math.random() < state.wardenCasts / 5
     const roll = rollFishingCatch(
       selectedRod,
       secretAvailable,
@@ -296,7 +295,7 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
     setTension(0)
     setProgress(0)
     setPhase('reeling')
-  }, [clearTimers, phase, selectedRod, state.discovered])
+  }, [clearTimers, phase, selectedRod, state.discovered, state.wardenCasts])
 
   const onPrimaryDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     event.preventDefault()
@@ -498,8 +497,8 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
 
         <div className="fishing__meta">
           <span className="fishing__pill fishing__pill--rod">
-            <RodIcon color={selectedRod.color} className="fishing__pill-icon" />
-            {selectedRodName}
+            <RodIcon rod={selectedRod} className="fishing__pill-icon" />
+            {selectedRodName}{selectedRod.id === 'warden' && !state.discovered.echo_fish && ` · Echo ${Math.min(5, state.wardenCasts + (busy ? 0 : 1))}/5`}
           </span>
           <span className="fishing__pill">
             {t('catches')}: {state.stats.catches}
@@ -575,7 +574,7 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
                   timePhase={timePhase}
                   progress={progress}
                   holding={holding}
-                  rodColor={selectedRod.color}
+                  rod={selectedRod}
                   rift={(phase === 'reeling' && pendingCatchRef.current?.kind === 'material') || (phase === 'result' && result?.kind === 'material')}
                 />
                 <div className="fishing-pond__location" aria-hidden="true">
@@ -1038,7 +1037,7 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
                       }${equipped ? ' rod-row--equipped' : ''}`}
                     >
                       <div className="rod-row__icon">
-                        <RodIcon color={rod.color} />
+                        <RodIcon rod={rod} />
                       </div>
                       <div className="rod-row__body">
                         <div className="rod-row__top">

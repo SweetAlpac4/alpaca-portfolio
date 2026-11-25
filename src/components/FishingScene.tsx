@@ -1,11 +1,14 @@
 import { memo, useEffect, useRef } from 'react'
 
+import { wardenReel } from './wardenReel'
+import type { RodDef } from '../lib/fishing'
+
 type SceneProps = {
   phase: 'idle' | 'casting' | 'waiting' | 'bite' | 'reeling' | 'result'
   timePhase: 'night' | 'dawn' | 'day' | 'dusk'
   progress: number
   holding: boolean
-  rodColor: string
+  rod: RodDef
   rift?: boolean
 }
 
@@ -193,7 +196,8 @@ function drawDock(ctx: CanvasRenderingContext2D, time: SceneProps['timePhase']) 
 }
 
 function drawActivity(ctx: CanvasRenderingContext2D, props: SceneProps, elapsed: number, phaseAge: number) {
-  const { phase, progress, holding, rodColor, timePhase } = props
+  const { phase, progress, holding, rod, timePhase } = props
+  const warden = rod.id === 'warden'
   const p = PALETTES[timePhase]
   const active = phase === 'casting' || phase === 'waiting' || phase === 'bite' || phase === 'reeling'
   const reeling = phase === 'reeling'
@@ -239,7 +243,7 @@ function drawActivity(ctx: CanvasRenderingContext2D, props: SceneProps, elapsed:
     const y = tipY + (bobY - tipY) * cast - Math.sin(cast * Math.PI) * 38
     const dip = phase === 'bite' ? Math.sin(elapsed * 24) * 2 : Math.sin(elapsed * 3) * 0.8
     const shake = reeling ? Math.sin(elapsed * 23) * 2 : 0
-    ctx.strokeStyle = '#e2e5cb'
+    ctx.strokeStyle = warden ? '#a7e8d6' : '#e2e5cb'
     ctx.lineWidth = 0.7
     ctx.globalAlpha = 0.8
     ctx.beginPath()
@@ -268,8 +272,8 @@ function drawActivity(ctx: CanvasRenderingContext2D, props: SceneProps, elapsed:
     }
     rect(ctx, '#17333b', x - 3 + shake, y - 5 + dip, 6, 10)
     rect(ctx, '#f1e7c9', x - 2 + shake, y + dip, 4, 3)
-    rect(ctx, '#d65d4a', x - 2 + shake, y - 4 + dip, 4, 4)
-    rect(ctx, '#ff9b77', x - 2 + shake, y - 4 + dip, 1, 3)
+    rect(ctx, warden ? '#22666a' : '#d65d4a', x - 2 + shake, y - 4 + dip, 4, 4)
+    rect(ctx, warden ? '#8dffde' : '#ff9b77', x - 2 + shake, y - 4 + dip, 1, 3)
     rect(ctx, '#efe2c3', x + shake, y - 7 + dip, 1, 3)
     if (phase === 'bite' || reeling) {
       for (let i = 0; i < 5; i++) {
@@ -283,27 +287,35 @@ function drawActivity(ctx: CanvasRenderingContext2D, props: SceneProps, elapsed:
 
   // Rod and line share one coordinate system, so the line always meets the tip.
   ctx.lineCap = 'square'
-  ctx.strokeStyle = '#273630'
+  ctx.strokeStyle = warden ? '#0b202b' : '#273630'
   ctx.lineWidth = 5
   ctx.beginPath()
   ctx.moveTo(388, 239)
   ctx.quadraticCurveTo(350, 159, tipX, tipY)
   ctx.stroke()
-  ctx.strokeStyle = rodColor
+  ctx.strokeStyle = warden ? '#29676a' : rod.color
   ctx.lineWidth = 3
   ctx.stroke()
-  ctx.strokeStyle = '#d3bc84'
+  ctx.strokeStyle = warden ? '#75bcae' : '#d3bc84'
   ctx.lineWidth = 1
   ctx.stroke()
-  ctx.strokeStyle = '#463b2d'
+  ctx.strokeStyle = warden ? '#132e37' : '#463b2d'
   ctx.lineWidth = 7
   ctx.beginPath()
   ctx.moveTo(388, 239)
   ctx.lineTo(375, 212)
   ctx.stroke()
-  rect(ctx, '#243c40', 367, 211, 9, 9)
-  rect(ctx, '#9cb8ad', 368, 212, 6, 6)
-  rect(ctx, '#466363', 370, 214, 3, 3)
+  if (warden) {
+    for (const pixel of wardenReel) {
+      rect(ctx, pixel.fill, 351 + pixel.x * 2, 190 + pixel.y * 2, pixel.width * 2, 2)
+    }
+    rect(ctx, '#c4c8a5', 378, 222, 6, 2)
+    rect(ctx, '#73958b', 381, 228, 6, 2)
+  } else {
+    rect(ctx, '#243c40', 367, 211, 9, 9)
+    rect(ctx, '#9cb8ad', 368, 212, 6, 6)
+    rect(ctx, '#466363', 370, 214, 3, 3)
+  }
 
   if (timePhase === 'night' || timePhase === 'dusk') {
     for (let i = 0; i < 7; i++) {

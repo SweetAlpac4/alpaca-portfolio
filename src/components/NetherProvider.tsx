@@ -6,6 +6,7 @@ import { useFishing } from './FishingProvider'
 type ActiveBrew = { id: string; recipe: BrewRecipeId }
 type NetherContextValue = {
   state: NetherState
+  spendResonance: () => void
   begin: (recipe: BrewRecipeId) => ActiveBrew | null
   finish: (id: string, result: BrewResult) => boolean
   cancel: (id: string) => void
@@ -23,6 +24,11 @@ export function NetherProvider({ children }: { children: ReactNode }) {
     setState(next)
     saveNetherState(next)
   }, [])
+  const spendResonance = useCallback(() => {
+    const state = current.current
+    if (state.resonance < 1) return
+    commit({ ...state, resonance: state.resonance - 1 })
+  }, [commit])
   const begin = useCallback((recipe: BrewRecipeId) => {
     if (active.current || !current.current.recipes.includes(recipe)) return null
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`
@@ -51,7 +57,7 @@ export function NetherProvider({ children }: { children: ReactNode }) {
     if (enabled && current.current.perfects < 5) return
     commit({ ...current.current, soulFlame: enabled })
   }, [commit])
-  const value = useMemo(() => ({ state, begin, finish, cancel, setSoulFlame }), [state, begin, finish, cancel, setSoulFlame])
+  const value = useMemo(() => ({ spendResonance, state, begin, finish, cancel, setSoulFlame }), [spendResonance, state, begin, finish, cancel, setSoulFlame])
   return <NetherContext.Provider value={value}>{children}</NetherContext.Provider>
 }
 export function useNether() {
