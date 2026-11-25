@@ -1,6 +1,8 @@
 import { useLang } from '../i18n'
 import { PixelIcon } from './PixelIcon'
 import { RodIcon } from './FishingIcons'
+import { PickaxeIcon } from './OreIcons'
+import type { PickaxeTier } from '../lib/cave'
 
 type Props = {
   onOpenBook: () => void
@@ -10,9 +12,11 @@ type Props = {
   onOpenFishing: () => void
   onOpenNether: () => void
   rodColor: string
+  onOpenCave: () => void
+  pickaxeTier: PickaxeTier
 }
 
-export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFishing, onOpenNether, rodColor }: Props) {
+export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFishing, onOpenNether, rodColor, onOpenCave, pickaxeTier }: Props) {
   const { lang, setLang, t } = useLang()
 
   return (
@@ -32,6 +36,11 @@ export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFi
       {activeBiome === 0 && (
         <button type="button" className="world-tools__game" onClick={onOpenFishing} aria-label={t('fishing')}>
           <RodIcon color={rodColor} />
+        </button>
+      )}
+      {activeBiome === 1 && (
+        <button type="button" className="world-tools__game" onClick={onOpenCave} aria-label={t('cave_open')} aria-keyshortcuts="C">
+          <PickaxeIcon tier={pickaxeTier} />
         </button>
       )}
       {activeBiome === 3 && (

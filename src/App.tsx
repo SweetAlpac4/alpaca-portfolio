@@ -3,6 +3,7 @@ import { MusicProvider } from './components/MusicPlayer'
 import { AchievementProvider } from './components/AchievementProvider'
 import { FishingProvider } from './components/FishingProvider'
 import { NetherProvider } from './components/NetherProvider'
+import { CaveProvider } from './components/CaveProvider'
 import { Portfolio } from './Portfolio'
 import { AdminPage } from './admin/AdminPage'
 
@@ -15,7 +16,9 @@ export default function App() {
           element={
             <AchievementProvider>
               <FishingProvider>
-                <NetherProvider><Portfolio /></NetherProvider>
+                <CaveProvider>
+                  <NetherProvider><Portfolio /></NetherProvider>
+                </CaveProvider>
               </FishingProvider>
             </AchievementProvider>
           }

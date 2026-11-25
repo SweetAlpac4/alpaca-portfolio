@@ -1,9 +1,10 @@
 import { FISH, RODS, type FishingState } from './fishing.ts'
 import { BREW_RECIPES, type NetherState } from './nether.ts'
 import { MATERIALS } from './materials.ts'
+import type { CaveState } from './cave.ts'
 import type { AchievementId } from './achievements'
 
-export function gameMilestones(fishing: FishingState, nether: NetherState): AchievementId[] {
+export function gameMilestones(fishing: FishingState, nether: NetherState, cave: CaveState): AchievementId[] {
   const matches: [AchievementId, boolean][] = [
     ['fishing_first', fishing.stats.catches >= 1],
     ['fishing_25', fishing.stats.catches >= 25],
@@ -18,6 +19,14 @@ export function gameMilestones(fishing: FishingState, nether: NetherState): Achi
     ['brew_recipes', BREW_RECIPES.every(recipe => nether.recipes.includes(recipe.id))],
     ['brew_collection', BREW_RECIPES.every(recipe => (nether.discovered[recipe.id]?.brews ?? 0) > 0)],
     ['brew_clean', nether.cleanBrews > 0],
+    ['cave_first_ore', cave.totalOres >= 1],
+    ['cave_100', cave.totalOres >= 100],
+    ['cave_all_ores', ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond'].every(ore => cave.foundOres.includes(ore as typeof cave.foundOres[number]))],
+    ['cave_pickaxe', cave.pickaxe === 'diamond'],
+    ['cave_find_diamond', cave.foundOres.includes('diamond')],
+    ['cave_combo', cave.bestCombo >= 8],
+    ['cave_clean', cave.cleanRuns >= 1],
+    ['cave_geologist', cave.quartzMined > 0 && cave.glowstoneMined > 0],
   ]
   return matches.filter(([, complete]) => complete).map(([id]) => id)
 }

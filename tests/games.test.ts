@@ -6,6 +6,7 @@ import { advanceBrew, BREW_DURATION, createBrewSession, currentBeat, finishBrew,
 import { gameMilestones } from '../src/lib/gameMilestones.ts'
 import { MATERIALS } from '../src/lib/materials.ts'
 import { SECRET_ENDING_ENABLED } from '../src/lib/features.ts'
+import { addOreToState, BLOCK_WEIGHTS, canUpgrade, createInitialCaveState, CAVE_STORAGE_KEY, generateGrid, isReachable, loadCaveState, PICKAXES, resolveMine, upgradePickaxe } from '../src/lib/cave.ts'
 
 const storage = new Map()
 globalThis.window = { localStorage: { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) } }
@@ -124,10 +125,99 @@ test('progression unlocks four recipes, cosmetics, rewards, and lifetime achieve
   assert.deepEqual(brewReward('luck', 'good'), { emberBait: 0, luck: 8 })
   const fishing = { ...createInitialFishingState(), rods: RODS.map(rod => rod.id), materialsFound: MATERIALS.map(item => item.id) }
   fishing.discovered = Object.fromEntries(FISH.filter(fish => !fish.secret).map(fish => [fish.id, { count: 1 }]))
-  const milestones = gameMilestones(fishing, nether)
+  const milestones = gameMilestones(fishing, nether, createInitialCaveState())
   for (const id of ['fishing_rods', 'fishing_collection', 'rift_collector', 'brew_master', 'brew_recipes', 'brew_clean']) assert.ok(milestones.includes(id))
   assert.ok(!milestones.includes('fishing_echo'))
   assert.equal(SECRET_ENDING_ENABLED, false)
+})
+
+test('Cave state starts empty, uses wood pickaxe, and serializes cleanly', () => {
+  const cave = createInitialCaveState()
+  assert.equal(cave.pickaxe, 'wood')
+  assert.deepEqual(Object.values(cave.ores), [0, 0, 0, 0, 0, 0])
+  assert.doesNotThrow(() => JSON.stringify(cave))
+})
+
+test('generated mining grid has 49 valid cells, coal in the shallow rows, and no row-one lava', () => {
+  const valid = new Set(['stone', 'coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond', 'gravel', 'lava', 'nether_quartz', 'glowstone_dust'])
+  const grid = generateGrid('diamond', () => 0.999)
+  assert.equal(grid.length, 49)
+  assert.deepEqual([...new Set(grid.map(block => block.row))], [1, 2, 3, 4, 5, 6, 7])
+  assert.deepEqual([...new Set(grid.map(block => block.col))], [1, 2, 3, 4, 5, 6, 7])
+  assert.ok(grid.every(block => valid.has(block.content)))
+  assert.ok(grid.filter(block => block.row === 1).every(block => block.content !== 'lava'))
+  assert.ok(grid.filter(block => block.row <= 3 && block.content === 'coal').length >= 2)
+  assert.ok(grid.filter(block => block.row <= 3).every(block => !['nether_quartz', 'glowstone_dust'].includes(block.content)))
+  for (const weights of Object.values(BLOCK_WEIGHTS)) assert.equal(Object.values(weights).reduce((sum, value) => sum + value, 0), 100)
+  for (let seed = 0; seed < 12; seed++) {
+    let cursor = seed
+    const sample = generateGrid('iron', () => ((cursor++ * 0.137) % 100) / 100)
+    assert.ok(sample.every(block => valid.has(block.content)))
+    assert.ok(sample.filter(block => block.row <= 3).every(block => block.content !== 'nether_quartz' && block.content !== 'glowstone_dust'))
+  }
+})
+
+test('mining route starts at the surface and extends only through neighboring cells', () => {
+  const grid = generateGrid('wood', () => 0)
+  const cell = (row, col) => grid.find(block => block.row === row && block.col === col)
+  assert.equal(isReachable(cell(1, 1), grid, 3), true)
+  assert.equal(isReachable(cell(2, 1), grid, 3), false)
+  assert.equal(isReachable(cell(4, 1), grid, 3), false)
+  grid[0] = { ...grid[0], mined: true }
+  assert.equal(isReachable(cell(1, 2), grid, 3), true)
+  assert.equal(isReachable(cell(2, 1), grid, 3), true)
+  assert.equal(isReachable(cell(2, 2), grid, 3), false)
+  assert.equal(isReachable(cell(1, 3), grid, 3), false)
+})
+
+test('mining costs and combo score resolve by block and depth', () => {
+  const block = (content, row = 3) => ({ id: 'test', row, col: 1, content, mined: false })
+  const lava = resolveMine(block('lava'), 8, 6, () => 0)
+  assert.equal(lava.durabilityCost, 4); assert.equal(lava.combo, 0)
+  const gravel = resolveMine(block('gravel'), 8, 4, () => 0)
+  assert.equal(gravel.durabilityCost, 2); assert.equal(gravel.combo, 0)
+  const stone = resolveMine(block('stone'), 8, 4, () => 0)
+  assert.equal(stone.durabilityCost, 1)
+  const ore = resolveMine(block('coal'), 8, 2, () => 0)
+  assert.equal(ore.combo, 3); assert.equal(ore.score, 4)
+  assert.equal(resolveMine(block('diamond', 7), 8, 0, () => 0).score, 83)
+})
+
+test('pickaxe upgrades spend exact ore costs without erasing lifetime discoveries', () => {
+  const initial = createInitialCaveState()
+  assert.equal(canUpgrade(initial), false)
+  assert.equal(upgradePickaxe(initial), null)
+  const stoneReady = { ...initial, ores: { ...initial.ores, coal: 8 }, foundOres: ['coal'] }
+  const stone = upgradePickaxe(stoneReady)
+  assert.equal(stone.pickaxe, 'stone'); assert.equal(stone.ores.coal, 0); assert.deepEqual(stone.foundOres, ['coal'])
+  const ironReady = { ...stone, ores: { ...stone.ores, coal: 16, iron: 8 }, foundOres: ['coal', 'iron'] }
+  const iron = upgradePickaxe(ironReady)
+  assert.equal(iron.pickaxe, 'iron'); assert.equal(iron.ores.coal, 0); assert.equal(iron.ores.iron, 0)
+  const diamondReady = { ...iron, ores: { ...iron.ores, coal: 16, iron: 10, diamond: 2 }, foundOres: ['coal', 'iron', 'diamond'] }
+  const diamond = upgradePickaxe(diamondReady)
+  assert.equal(diamond.pickaxe, 'diamond'); assert.equal(diamond.ores.diamond, 0)
+  assert.deepEqual(diamond.foundOres, ['coal', 'iron', 'diamond'])
+  assert.equal(PICKAXES.diamond.maxRow, 7); assert.equal(upgradePickaxe(diamond), null)
+})
+
+test('ore discovery and cave save loading are defensive', () => {
+  const first = addOreToState(createInitialCaveState(), 'iron')
+  const second = addOreToState(first, 'iron', 2)
+  assert.equal(second.totalOres, 3); assert.deepEqual(second.foundOres, ['iron'])
+  storage.set(CAVE_STORAGE_KEY, '{broken json')
+  assert.equal(loadCaveState().pickaxe, 'wood')
+  storage.set(CAVE_STORAGE_KEY, JSON.stringify({ pickaxe: 'impossible', ores: { coal: -10, iron: 'x' }, totalOres: -2, foundOres: ['bad', 'diamond', 'diamond'], runs: 3.9 }))
+  const loaded = loadCaveState()
+  assert.equal(loaded.pickaxe, 'wood'); assert.equal(loaded.ores.coal, 0); assert.equal(loaded.totalOres, 0)
+  assert.deepEqual(loaded.foundOres, ['diamond']); assert.equal(loaded.runs, 3)
+})
+
+test('Cave milestones unlock for a fully progressed miner', () => {
+  const fishing = createInitialFishingState()
+  const nether = createInitialNetherState()
+  const cave = { ...createInitialCaveState(), pickaxe: 'diamond', totalOres: 100, foundOres: ['coal', 'iron', 'gold', 'redstone', 'lapis', 'diamond'], bestCombo: 8, cleanRuns: 1, quartzMined: 1, glowstoneMined: 1 }
+  const milestones = gameMilestones(fishing, nether, cave)
+  for (const id of ['cave_first_ore', 'cave_100', 'cave_all_ores', 'cave_pickaxe', 'cave_find_diamond', 'cave_combo', 'cave_clean', 'cave_geologist']) assert.ok(milestones.includes(id))
 })
 
 test('Nether save migration filters malformed records and derives recipe unlocks', () => {

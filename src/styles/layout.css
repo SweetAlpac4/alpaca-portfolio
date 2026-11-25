@@ -330,10 +330,10 @@
   background: rgba(96, 96, 104, 0.6);
 }
 
-.hotbar__slot img {
+.hotbar__slot svg {
   width: 32px;
   height: 32px;
-  image-rendering: pixelated;
+  filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.55));
 }
 
 .hotbar__slot--active {
@@ -935,7 +935,7 @@
     height: 38px;
   }
 
-  .hotbar__slot img {
+  .hotbar__slot svg {
     width: 26px;
     height: 26px;
   }
@@ -990,7 +990,7 @@
     height: 34px;
   }
 
-  .hotbar__slot img {
+  .hotbar__slot svg {
     width: 23px;
     height: 23px;
   }

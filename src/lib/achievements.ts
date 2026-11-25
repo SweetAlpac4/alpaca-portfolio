@@ -22,6 +22,14 @@ export type AchievementId =
   | 'brew_recipes'
   | 'brew_collection'
   | 'brew_clean'
+  | 'cave_first_ore'
+  | 'cave_100'
+  | 'cave_all_ores'
+  | 'cave_pickaxe'
+  | 'cave_find_diamond'
+  | 'cave_combo'
+  | 'cave_clean'
+  | 'cave_geologist'
 
 export type PixelIconName =
   | 'book'
@@ -359,6 +367,54 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       "en": "Hit all 9 doses without overheating.",
       "id": "Tepatkan 9 takaran tanpa terlalu panas."
     }
+  },
+  {
+    id: 'cave_first_ore', icon: 'diamond',
+    title: { en: 'First Strikes', id: 'Pukulan Pertama' },
+    description: { en: 'Mine your first ore.', id: 'Tambang bijih pertamamu.' },
+    hint: { en: 'Mine your first ore.', id: 'Tambang bijih pertamamu.' },
+  },
+  {
+    id: 'cave_100', icon: 'trophy',
+    title: { en: 'Ore Hoarder', id: 'Penimbun Bijih' },
+    description: { en: 'Mine 100 ores over time.', id: 'Tambang 100 bijih sepanjang permainan.' },
+    hint: { en: 'Mine 100 ores over time.', id: 'Tambang 100 bijih sepanjang permainan.' },
+  },
+  {
+    id: 'cave_all_ores', icon: 'chest',
+    title: { en: 'Full Cart', id: 'Gerobak Penuh' },
+    description: { en: 'Discover all 6 cave ores.', id: 'Temukan keenam jenis bijih Cave.' },
+    hint: { en: 'Discover all 6 cave ores.', id: 'Temukan keenam jenis bijih Cave.' },
+  },
+  {
+    id: 'cave_pickaxe', icon: 'diamond',
+    title: { en: 'Fully Upgraded', id: 'Puncak Peralatan' },
+    description: { en: 'Own the diamond pickaxe.', id: 'Miliki beliung diamond.' },
+    hint: { en: 'Own the diamond pickaxe.', id: 'Miliki beliung diamond.' },
+  },
+  {
+    id: 'cave_find_diamond', icon: 'diamond',
+    title: { en: 'Diamond in the Rough', id: 'Berlian Kasar' },
+    description: { en: 'Find a diamond while mining.', id: 'Temukan diamond saat menambang.' },
+    hint: { en: 'Find a diamond while mining.', id: 'Temukan diamond saat menambang.' },
+  },
+  {
+    id: 'cave_combo', icon: 'blaze',
+    title: { en: 'Chain Reaction', id: 'Rantai Tambang' },
+    description: { en: 'Reach a combo of 8 in one run.', id: 'Raih kombo 8 dalam satu sesi.' },
+    hint: { en: 'Reach a combo of 8 in one run.', id: 'Raih kombo 8 dalam satu sesi.' },
+  },
+  {
+    id: 'cave_clean', icon: 'pearl',
+    title: { en: 'No Lava, No Problem', id: 'Aman Tanpa Lava' },
+    description: { en: 'Finish one run without hitting lava.', id: 'Selesaikan satu sesi tanpa terkena lava.' },
+    hint: { en: 'Finish one run without hitting lava.', id: 'Selesaikan satu sesi tanpa terkena lava.' },
+  },
+  {
+    id: 'cave_geologist', icon: 'sculk',
+    title: { en: 'Deep Geologist', id: 'Geolog Dalam' },
+    description: { en: 'Mine both quartz and glowstone.', id: 'Tambang kuarsa dan glowstone.' },
+    hint: { en: 'Mine both quartz and glowstone.', id: 'Tambang kuarsa dan glowstone.' },
   },
 
 ]

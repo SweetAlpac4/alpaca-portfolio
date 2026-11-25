@@ -27,7 +27,7 @@ import {
   type RodDef,
   type RodId,
 } from '../lib/fishing'
-import type { MaterialId } from '../lib/materials'
+import { isMaterialId, type MaterialId } from '../lib/materials'
 
 type FishingContextValue = {
   state: FishingState
@@ -42,6 +42,7 @@ type FishingContextValue = {
   settleBrew: (id: string, refund: MaterialBag, reward: FishingEffects) => boolean
   recordCatch: (fish: FishCatch, perfect: boolean) => RodDef[]
   recordMaterial: (material: MaterialId, amount?: number, perfect?: boolean) => void
+  addMaterials: (materials: Partial<Record<MaterialId, number>>) => void
   recordEscape: () => void
   selectRod: (id: RodId) => void
   releaseFish: (id: string) => void
@@ -165,6 +166,22 @@ export function FishingProvider({ children }: { children: ReactNode }) {
     [commit],
   )
 
+  const addMaterials = useCallback((additions: Partial<Record<MaterialId, number>>) => {
+    const current = stateRef.current
+    const materials = { ...current.materials }
+    const found = new Set(current.materialsFound)
+    for (const [rawId, rawAmount] of Object.entries(additions)) {
+      if (typeof rawAmount !== 'number' || !Number.isFinite(rawAmount)) continue
+      const amount = Math.max(1, Math.floor(rawAmount))
+      if (!isMaterialId(rawId)) continue
+      const id = rawId
+      materials[id] = (materials[id] ?? 0) + amount
+      found.add(id)
+    }
+    if (Object.keys(additions).length === 0) return
+    commit({ ...current, materials, materialsFound: Array.from(found) })
+  }, [commit])
+
   const recordEscape = useCallback(() => {
     const current = stateRef.current
     commit({
@@ -217,6 +234,7 @@ export function FishingProvider({ children }: { children: ReactNode }) {
       settleBrew,
       recordCatch,
       recordMaterial,
+      addMaterials,
       recordEscape,
       selectRod,
       releaseFish,
@@ -229,6 +247,7 @@ export function FishingProvider({ children }: { children: ReactNode }) {
     recordCast,
     recordCatch,
     recordMaterial,
+    addMaterials,
     recordEscape,
     releaseFish,
     reset,

@@ -1,5 +1,6 @@
 import { SECTIONS } from '../data/sections'
 import { useLang } from '../i18n'
+import { BiomeIcon } from './BiomeIcon'
 
 type Props = {
   active: number
@@ -34,7 +35,7 @@ export function Hotbar({
               aria-label={t(section.labelKey)}
               aria-current={index === active ? 'true' : undefined}
             >
-              <img src={section.texture} alt="" className="pixel" />
+              <BiomeIcon name={section.id} />
               <span className="hotbar__tip">{t(section.labelKey)}</span>
               <span className="hotbar__key">{index + 1}</span>
             </button>

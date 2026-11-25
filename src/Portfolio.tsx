@@ -13,7 +13,9 @@ import { AchievementToast } from './components/AchievementToast'
 import { useAchievements } from './components/AchievementProvider'
 import { FishingGame } from './components/FishingGame'
 import { useFishing } from './components/FishingProvider'
+import { useCave } from './components/CaveProvider'
 import { NetherGame } from './components/NetherGame'
+import { CaveGame } from './components/CaveGame'
 import { GameMilestones } from './components/GameMilestones'
 import { ARTIFACTS, ACHIEVEMENTS } from './lib/achievements'
 import { Overworld } from './sections/Overworld'
@@ -29,6 +31,7 @@ export function Portfolio() {
   const { start, setTrack } = useMusic()
   const { unlocked, announcement } = useAchievements()
   const { state: fishingState, selectedRod } = useFishing()
+  const { state: caveState } = useCave()
 
   const content = data ?? fallbackContent
   const worldRef = useRef<HTMLDivElement>(null)
@@ -43,6 +46,7 @@ export function Portfolio() {
   const [bookOpen, setBookOpen] = useState(false)
   const [fishingOpen, setFishingOpen] = useState(false)
   const [netherOpen, setNetherOpen] = useState(false)
+  const [caveOpen, setCaveOpen] = useState(false)
   const [viewport, setViewport] = useState({ w: 0, h: 0 })
 
   const artifactsFound = ARTIFACTS.filter((achievement) =>
@@ -50,15 +54,25 @@ export function Portfolio() {
   ).length
   const closeBook = useCallback(() => setBookOpen(false), [])
   const closeNether = useCallback(() => setNetherOpen(false), [])
+  const closeCave = useCallback(() => setCaveOpen(false), [])
+  const openCave = useCallback(() => {
+    if (!entered || active !== 1) return
+    setFishingOpen(false)
+    setNetherOpen(false)
+    setBookOpen(false)
+    setCaveOpen(true)
+  }, [active, entered])
   const openNether = useCallback(() => {
     if (!entered || active !== 3) return
     setFishingOpen(false)
+    setCaveOpen(false)
     setBookOpen(false)
     setNetherOpen(true)
   }, [active, entered])
   const openFishing = useCallback(() => {
     if (!entered || active !== 0) return
     setNetherOpen(false)
+    setCaveOpen(false)
     setBookOpen(false)
     setFishingOpen(true)
   }, [active, entered])
@@ -73,12 +87,14 @@ export function Portfolio() {
 
   const goToNether = useCallback(() => {
     setFishingOpen(false)
+    setCaveOpen(false)
     setNetherOpen(false)
     setBookOpen(false)
     goTo(3)
   }, [goTo])
   const goToOverworld = useCallback(() => {
     setFishingOpen(false)
+    setCaveOpen(false)
     setNetherOpen(false)
     setBookOpen(false)
     goTo(0)
@@ -121,6 +137,10 @@ export function Portfolio() {
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return
       if (target?.isContentEditable) return
       if (!entered || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return
+      if (caveOpen) {
+        if (event.code === 'KeyC') { event.preventDefault(); setCaveOpen(false) }
+        return
+      }
       if (event.key === 'F3') {
         event.preventDefault()
         setDebug((current) => !current)
@@ -149,6 +169,7 @@ export function Portfolio() {
       }
 
       if (event.code === 'KeyN' && active === 3) { event.preventDefault(); openNether(); return }
+      if (event.code === 'KeyC' && active === 1) { event.preventDefault(); openCave(); return }
 
       if ((event.key === 'f' || event.key === 'F') && active === 0) {
         event.preventDefault()
@@ -168,7 +189,7 @@ export function Portfolio() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [active, bookOpen, fishingOpen, netherOpen, entered, openNether, openFishing, goTo])
+  }, [active, bookOpen, caveOpen, fishingOpen, netherOpen, entered, openCave, openNether, openFishing, goTo])
 
   useEffect(() => {
     const update = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
@@ -233,6 +254,8 @@ export function Portfolio() {
         activeBiome={entered ? active : -1}
         onOpenFishing={openFishing}
         onOpenNether={openNether}
+        onOpenCave={openCave}
+        pickaxeTier={caveState.pickaxe}
         rodColor={selectedRod.color}
       />
       <MusicControls />
@@ -250,6 +273,7 @@ export function Portfolio() {
       <AchievementBook open={bookOpen} onClose={closeBook} />
       {fishingOpen && <FishingGame onClose={closeFishing} onGoToNether={goToNether} />}
       {netherOpen && <NetherGame onClose={closeNether} onGoToFishing={goToOverworld} />}
+      {caveOpen && <CaveGame onClose={closeCave} />}
 
       {debug && (
         <pre className="debug">
@@ -264,7 +288,8 @@ Fish: ${fishingState.stats.catches} caught / ${fishingState.chest.length} in che
 F3: debug screen on
 E: advancement book
 F: fishing
-N: Nether Brewmaster`}
+N: Nether Brewmaster
+C: Cave Miner`}
         </pre>
       )}
     </>
