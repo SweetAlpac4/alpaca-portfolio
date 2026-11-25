@@ -6,6 +6,7 @@ type SceneProps = {
   progress: number
   holding: boolean
   rodColor: string
+  rift?: boolean
 }
 
 type Palette = {
@@ -218,6 +219,18 @@ function drawActivity(ctx: CanvasRenderingContext2D, props: SceneProps, elapsed:
     rect(ctx, p.light, x - spread / 2, y, spread, 1)
   }
   ctx.globalAlpha = 1
+  if (props.rift) {
+    ctx.save()
+    ctx.strokeStyle = '#ed9a74'
+    for (let i = 0; i < 4; i++) {
+      const pulse = (elapsed * 0.6 + i / 4) % 1
+      ctx.globalAlpha = (1 - pulse) * 0.65
+      ctx.beginPath()
+      ctx.ellipse(bobX, bobY + 3, 8 + pulse * 32, 3 + pulse * 10, 0, 0, Math.PI * 2)
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
   drawDock(ctx, timePhase)
 
   if (active) {

@@ -409,6 +409,75 @@
   pointer-events: none;
 }
 
+
+.world-tools {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 46;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.world-tools .lang {
+  position: static;
+}
+
+.world-tools__book {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 8px;
+  background: rgba(20, 20, 24, 0.82);
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.12), inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+  color: #e8d9ad;
+  font-size: 0.62rem;
+  cursor: pointer;
+}
+
+.world-tools__book:hover {
+  color: #ffffa0;
+  background: rgba(60, 66, 56, 0.9);
+}
+
+.world-tools__book svg {
+  width: 22px;
+  height: 22px;
+}
+
+.world-tools__count { color: #d9c48f; font-size: 0.58rem; }
+
+.world-tools__game {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 5px;
+  background: rgba(20, 20, 24, 0.82);
+  border: 2px solid #000;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.12), inset -2px -2px 0 rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.world-tools__game:hover {
+  background: rgba(60, 66, 56, 0.9);
+  filter: brightness(1.18);
+}
+
+.world-tools__game svg {
+  width: 23px;
+  height: 23px;
+}
+
+@media (max-width: 420px) {
+  .world-tools { gap: 3px; }
+  .world-tools__book { padding-inline: 5px; gap: 3px; }
+  .world-tools__book-label { display: none; }
+}
+
 /* ---------- language toggle ---------- */
 
 .lang {
@@ -898,7 +967,7 @@
     bottom: 66px;
   }
 
-  .lang {
+  .world-tools {
     top: 10px;
     right: 10px;
   }

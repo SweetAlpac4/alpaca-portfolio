@@ -9,6 +9,19 @@ export type AchievementId =
   | 'end_pearl'
   | 'credits_star'
   | 'curious_explorer'
+  | 'fishing_first'
+  | 'fishing_25'
+  | 'fishing_rods'
+  | 'fishing_collection'
+  | 'fishing_echo'
+  | 'rift_first'
+  | 'rift_collector'
+  | 'brew_first'
+  | 'brew_perfect'
+  | 'brew_master'
+  | 'brew_recipes'
+  | 'brew_collection'
+  | 'brew_clean'
 
 export type PixelIconName =
   | 'book'
@@ -138,6 +151,216 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       id: 'Temukan keenam artefak yang hilang.',
     },
   },
+  {
+    "id": "fishing_first",
+    "icon": "chest",
+    "title": {
+      "en": "First Catch",
+      "id": "Tangkapan Pertama"
+    },
+    "description": {
+      "en": "Catch your first fish.",
+      "id": "Dapatkan tangkapan ikan pertama."
+    },
+    "hint": {
+      "en": "Catch your first fish.",
+      "id": "Dapatkan tangkapan ikan pertama."
+    }
+  },
+  {
+    "id": "fishing_25",
+    "icon": "trophy",
+    "title": {
+      "en": "Patient Angler",
+      "id": "Pemancing Tekun"
+    },
+    "description": {
+      "en": "Catch 25 fish.",
+      "id": "Tangkap 25 ikan."
+    },
+    "hint": {
+      "en": "Catch 25 fish.",
+      "id": "Tangkap 25 ikan."
+    }
+  },
+  {
+    "id": "fishing_rods",
+    "icon": "diamond",
+    "title": {
+      "en": "Rod Collector",
+      "id": "Kolektor Pancing"
+    },
+    "description": {
+      "en": "Unlock all 5 fishing rods.",
+      "id": "Buka semua 5 pancing."
+    },
+    "hint": {
+      "en": "Unlock all 5 fishing rods.",
+      "id": "Buka semua 5 pancing."
+    }
+  },
+  {
+    "id": "fishing_collection",
+    "icon": "book",
+    "title": {
+      "en": "Full Collection",
+      "id": "Koleksi Lengkap"
+    },
+    "description": {
+      "en": "Discover all 12 regular catches. The secret fish is a separate challenge.",
+      "id": "Temukan 12 tangkapan biasa. Ikan rahasia punya tantangan tersendiri."
+    },
+    "hint": {
+      "en": "Discover all 12 regular catches. The secret fish is a separate challenge.",
+      "id": "Temukan 12 tangkapan biasa. Ikan rahasia punya tantangan tersendiri."
+    }
+  },
+  {
+    "id": "fishing_echo",
+    "icon": "sculk",
+    "title": {
+      "en": "Echo from Below",
+      "id": "Gema dari Kedalaman"
+    },
+    "description": {
+      "en": "Catch the secret Echo Fish using an Echo Shard.",
+      "id": "Tangkap Ikan Gema dengan Echo Shard."
+    },
+    "hint": {
+      "en": "Catch the secret Echo Fish using an Echo Shard.",
+      "id": "Tangkap Ikan Gema dengan Echo Shard."
+    },
+    "secret": true
+  },
+  {
+    "id": "rift_first",
+    "icon": "blaze",
+    "title": {
+      "en": "Through the Rift",
+      "id": "Dari Celah Nether"
+    },
+    "description": {
+      "en": "Reel in a Nether material.",
+      "id": "Pancing satu bahan Nether."
+    },
+    "hint": {
+      "en": "Reel in a Nether material.",
+      "id": "Pancing satu bahan Nether."
+    }
+  },
+  {
+    "id": "rift_collector",
+    "icon": "chest",
+    "title": {
+      "en": "Well Stocked",
+      "id": "Bahan Lengkap"
+    },
+    "description": {
+      "en": "Find all 6 material types. Used materials still count.",
+      "id": "Temukan 6 jenis bahan. Bahan yang sudah dipakai tetap dihitung."
+    },
+    "hint": {
+      "en": "Find all 6 material types. Used materials still count.",
+      "id": "Temukan 6 jenis bahan. Bahan yang sudah dipakai tetap dihitung."
+    }
+  },
+  {
+    "id": "brew_first",
+    "icon": "blaze",
+    "title": {
+      "en": "First Brew",
+      "id": "Racikan Pertama"
+    },
+    "description": {
+      "en": "Finish a brew with Good quality or better.",
+      "id": "Selesaikan racikan dengan kualitas Bagus atau lebih."
+    },
+    "hint": {
+      "en": "Finish a brew with Good quality or better.",
+      "id": "Selesaikan racikan dengan kualitas Bagus atau lebih."
+    }
+  },
+  {
+    "id": "brew_perfect",
+    "icon": "star",
+    "title": {
+      "en": "Just Right",
+      "id": "Pas Banget"
+    },
+    "description": {
+      "en": "Make your first Perfect brew.",
+      "id": "Buat racikan Sempurna pertama."
+    },
+    "hint": {
+      "en": "Make your first Perfect brew.",
+      "id": "Buat racikan Sempurna pertama."
+    }
+  },
+  {
+    "id": "brew_master",
+    "icon": "trophy",
+    "title": {
+      "en": "Brewmaster",
+      "id": "Brewmaster"
+    },
+    "description": {
+      "en": "Make 5 Perfect brews. Unlock the Soul Flame cosmetic.",
+      "id": "Buat 5 racikan Sempurna. Buka kosmetik Api Jiwa."
+    },
+    "hint": {
+      "en": "Make 5 Perfect brews. Unlock the Soul Flame cosmetic.",
+      "id": "Buat 5 racikan Sempurna. Buka kosmetik Api Jiwa."
+    }
+  },
+  {
+    "id": "brew_recipes",
+    "icon": "book",
+    "title": {
+      "en": "Recipe Collector",
+      "id": "Kolektor Resep"
+    },
+    "description": {
+      "en": "Unlock all 4 recipes by completing 5 brews.",
+      "id": "Buka 4 resep dengan menyelesaikan 5 racikan."
+    },
+    "hint": {
+      "en": "Unlock all 4 recipes by completing 5 brews.",
+      "id": "Buka 4 resep dengan menyelesaikan 5 racikan."
+    }
+  },
+  {
+    "id": "brew_collection",
+    "icon": "diamond",
+    "title": {
+      "en": "A Full Shelf",
+      "id": "Rak Ramuan Lengkap"
+    },
+    "description": {
+      "en": "Brew all 4 recipes with Good quality or better.",
+      "id": "Racik 4 resep dengan kualitas Bagus atau lebih."
+    },
+    "hint": {
+      "en": "Brew all 4 recipes with Good quality or better.",
+      "id": "Racik 4 resep dengan kualitas Bagus atau lebih."
+    }
+  },
+  {
+    "id": "brew_clean",
+    "icon": "pearl",
+    "title": {
+      "en": "Not a Drop Spilled",
+      "id": "Tanpa Tumpah"
+    },
+    "description": {
+      "en": "Hit all 9 doses without overheating.",
+      "id": "Tepatkan 9 takaran tanpa terlalu panas."
+    },
+    "hint": {
+      "en": "Hit all 9 doses without overheating.",
+      "id": "Tepatkan 9 takaran tanpa terlalu panas."
+    }
+  },
+
 ]
 
 export const ARTIFACTS = ACHIEVEMENTS.filter(

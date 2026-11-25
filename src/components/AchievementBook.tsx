@@ -16,6 +16,7 @@ type Props = {
 export function AchievementBook({ open, onClose }: Props) {
   const { t, pick } = useLang()
   const { unlocked, reset } = useAchievements()
+  const [category, setCategory] = useState<'all' | 'artifacts' | 'games'>('all')
   const [confirmReset, setConfirmReset] = useState(false)
   const closeRef = useRef<HTMLButtonElement>(null)
 
@@ -23,7 +24,7 @@ export function AchievementBook({ open, onClose }: Props) {
     unlocked.has(achievement.id),
   ).length
   const allFound = artifactsFound === ARTIFACTS.length
-  const percent = (artifactsFound / ARTIFACTS.length) * 100
+  const percent = (unlocked.size / ACHIEVEMENTS.length) * 100
 
   useEffect(() => {
     if (!open) {
@@ -99,18 +100,18 @@ export function AchievementBook({ open, onClose }: Props) {
 
         <div className="book__progress">
           <div className="book__progress-top">
-            <span>{t('artifacts_found')}</span>
+            <span>{t('achievements_unlocked')}</span>
             <strong>
-              {artifactsFound} / {ARTIFACTS.length}
+              {unlocked.size} / {ACHIEVEMENTS.length}
             </strong>
           </div>
           <div
             className="book__bar"
             role="progressbar"
             aria-valuemin={0}
-            aria-valuemax={ARTIFACTS.length}
-            aria-valuenow={artifactsFound}
-            aria-label={t('artifacts_found')}
+            aria-valuemax={ACHIEVEMENTS.length}
+            aria-valuenow={unlocked.size}
+            aria-label={t('achievements_unlocked')}
           >
             <span style={{ width: `${percent}%` }} />
           </div>
@@ -127,8 +128,11 @@ export function AchievementBook({ open, onClose }: Props) {
             </div>
           )}
 
+          <div className="book-filters" aria-label={t('achievement_book')}>
+            {(['all', 'artifacts', 'games'] as const).map(value => <button key={value} aria-pressed={category === value} onClick={() => setCategory(value)}>{t(`achievement_filter_${value}`)}</button>)}
+          </div>
           <div className="advancement-grid">
-            {ACHIEVEMENTS.map((achievement) => {
+            {ACHIEVEMENTS.filter(item => category === 'all' || (category === 'artifacts' ? Boolean(item.section) || item.id === META_ACHIEVEMENT_ID : !item.section && item.id !== META_ACHIEVEMENT_ID)).map((achievement) => {
               const found = unlocked.has(achievement.id)
               const isMeta = achievement.id === META_ACHIEVEMENT_ID
               const title =

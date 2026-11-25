@@ -2,6 +2,7 @@ import type { Localized } from '../data/types'
 import { useLang } from '../i18n'
 import { HiddenItem } from '../components/HiddenItem'
 import { useAchievements } from '../components/AchievementProvider'
+import { SECRET_ENDING_ENABLED } from '../lib/features'
 import { META_ACHIEVEMENT_ID } from '../lib/achievements'
 
 type Props = {
@@ -49,7 +50,7 @@ export function Credits({ name, role, credits, active, onRespawn }: Props) {
             <p className="credits__value">{pick(credits)}</p>
           </div>
 
-          {isUnlocked(META_ACHIEVEMENT_ID) && (
+          {SECRET_ENDING_ENABLED && isUnlocked(META_ACHIEVEMENT_ID) && (
             <div className="credits__block credits__block--secret">
               <p className="credits__label">{t('secret_ending_label')}</p>
               <p className="credits__value">{t('secret_ending')}</p>

@@ -18,14 +18,21 @@ import {
   formatLength,
   formatWeight,
   rodRequirementProgress,
-  rollCatch,
-  type CatchRoll,
+  rollFishingCatch,
   type FishCatch,
+  type FishingRoll,
+  type FishingEffects,
   type RodDef,
 } from '../lib/fishing'
+import {
+  MATERIAL_BY_ID,
+  materialCount,
+  type MaterialId,
+} from '../lib/materials'
 import { hasSecretItem } from '../lib/secrets'
 import { useFishing } from './FishingProvider'
 import { FishIcon, RodIcon } from './FishingIcons'
+import { MaterialIcon } from './MaterialIcons'
 import { FishingScene } from './FishingScene'
 
 type Tab = 'cast' | 'chest' | 'journal' | 'rods'
@@ -34,10 +41,12 @@ type EscapeReason = 'late' | 'snap'
 type TimePhase = 'night' | 'dawn' | 'day' | 'dusk'
 type Result =
   | { kind: 'catch'; fish: FishCatch; perfect: boolean }
+  | { kind: 'material'; material: MaterialId; perfect: boolean }
   | { kind: 'escape'; reason: EscapeReason }
 
 type Props = {
   onClose: () => void
+  onGoToNether: () => void
 }
 
 const EMPTY_SLOTS = Array.from({ length: MAX_CHEST_SIZE }, (_, index) => index)
@@ -57,7 +66,7 @@ function getTimePhase(date: Date): TimePhase {
   return 'night'
 }
 
-export function FishingGame({ onClose }: Props) {
+export function FishingGame({ onClose, onGoToNether }: Props) {
   const { t, pick, lang } = useLang()
   const {
     state,
@@ -66,6 +75,7 @@ export function FishingGame({ onClose }: Props) {
     chestFull,
     recordCast,
     recordCatch,
+    recordMaterial,
     recordEscape,
     selectRod,
     releaseFish,
@@ -94,7 +104,8 @@ export function FishingGame({ onClose }: Props) {
   const tensionRef = useRef(0)
   const maxTensionRef = useRef(0)
   const dangerRef = useRef(0)
-  const pendingCatchRef = useRef<CatchRoll | null>(null)
+  const pendingCatchRef = useRef<FishingRoll | null>(null)
+  const castEffectsRef = useRef<FishingEffects>({ emberBait: 0, luck: 0 })
   const finishedRef = useRef(false)
 
   useEffect(() => {
@@ -180,8 +191,8 @@ export function FishingGame({ onClose }: Props) {
 
   const finishCatch = useCallback(() => {
     if (finishedRef.current) return
-    const roll = pendingCatchRef.current
-    if (!roll) {
+    const pending = pendingCatchRef.current
+    if (!pending) {
       finishEscape('snap')
       return
     }
@@ -189,18 +200,37 @@ export function FishingGame({ onClose }: Props) {
     clearTimers()
     holdingRef.current = false
     setHolding(false)
+    const perfect = maxTensionRef.current <= 82
+
+    if (pending.kind === 'material') {
+      recordMaterial(pending.material, pending.amount, perfect)
+      setNewRods([])
+      setResult({
+        kind: 'material',
+        material: pending.material,
+        perfect,
+      })
+      setPhase('result')
+      return
+    }
+
     const fish: FishCatch = {
-      ...roll,
+      ...pending.roll,
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       rod: selectedRod.id,
       caughtAt: Date.now(),
     }
-    const perfect = maxTensionRef.current <= 82
     const unlocked = recordCatch(fish, perfect)
     setNewRods(unlocked)
     setResult({ kind: 'catch', fish, perfect })
     setPhase('result')
-  }, [clearTimers, finishEscape, recordCatch, selectedRod.id])
+  }, [
+    clearTimers,
+    finishEscape,
+    recordCatch,
+    recordMaterial,
+    selectedRod.id,
+  ])
 
   const beginCast = useCallback(() => {
     if (phase !== 'idle' && phase !== 'result') return
@@ -224,7 +254,7 @@ export function FishingGame({ onClose }: Props) {
     finishedRef.current = false
     holdingRef.current = false
     setHolding(false)
-    recordCast()
+    castEffectsRef.current = recordCast()
     setPhase('casting')
 
     later(() => {
@@ -251,10 +281,11 @@ export function FishingGame({ onClose }: Props) {
     clearTimers()
     const secretAvailable =
       hasSecretItem('echo_shard') && !state.discovered.echo_fish
-    const roll = rollCatch(
+    const roll = rollFishingCatch(
       selectedRod,
       secretAvailable,
       Boolean(state.discovered.echo_fish),
+      castEffectsRef.current,
     )
     pendingCatchRef.current = roll
     finishedRef.current = false
@@ -479,6 +510,9 @@ export function FishingGame({ onClose }: Props) {
           <span className="fishing__pill">
             {t('best_streak')}: {state.stats.bestStreak}
           </span>
+          <button className="fishing-brew-link" onClick={onGoToNether} disabled={busy}>{t('brew_go_nether')} ({Object.values(state.materials).reduce((total, count) => total + count, 0)})</button>
+          {state.effects.emberBait > 0 && <span className="fishing__pill">{t('ember_bait')}: {state.effects.emberBait}</span>}
+          {state.effects.luck > 0 && <span className="fishing__pill">{t('luck_potion')}: {state.effects.luck}</span>}
         </div>
 
         <div className="fishing__tabs" role="tablist" aria-label={t('fishing')}>
@@ -542,6 +576,7 @@ export function FishingGame({ onClose }: Props) {
                   progress={progress}
                   holding={holding}
                   rodColor={selectedRod.color}
+                  rift={(phase === 'reeling' && pendingCatchRef.current?.kind === 'material') || (phase === 'result' && result?.kind === 'material')}
                 />
                 <div className="fishing-pond__location" aria-hidden="true">
                   <span>{t('fishing_location')}</span>
@@ -560,7 +595,7 @@ export function FishingGame({ onClose }: Props) {
                   {phase === 'waiting' && t('waiting_bite')}
                   {phase === 'bite' && t('bite')}
                   {phase === 'reeling' && (holding ? t('reeling') : t('release_to_slack'))}
-                  {phase === 'result' && (result?.kind === 'catch' ? t('caught') : t('escaped'))}
+                  {phase === 'result' && (result?.kind === 'catch' ? t('caught') : result?.kind === 'material' ? t('material_found') : t('escaped'))}
                 </div>
               </div>
 
@@ -662,7 +697,9 @@ export function FishingGame({ onClose }: Props) {
                     className={`fishing-result${
                       result.kind === 'catch'
                         ? ' fishing-result--catch'
-                        : ' fishing-result--escape'
+                        : result.kind === 'material'
+                          ? ' fishing-result--material'
+                          : ' fishing-result--escape'
                     }`}
                   >
                     {result.kind === 'catch' ? (
@@ -692,6 +729,34 @@ export function FishingGame({ onClose }: Props) {
                               {newRods.map((rod) => pick(rod.name)).join(', ')}
                             </p>
                           )}
+                        </div>
+                      </>
+                    ) : result.kind === 'material' ? (
+                      <>
+                        <div className="fishing-result__icon fishing-result__icon--material">
+                          <MaterialIcon material={result.material} />
+                        </div>
+                        <div className="fishing-result__body">
+                          <p className="fishing-result__eyebrow">
+                            {result.perfect
+                              ? t('perfect_rift')
+                              : t('material_found')}
+                          </p>
+                          <h3>{pick(MATERIAL_BY_ID[result.material].name)}</h3>
+                          <p className="fishing-result__meta">
+                            {t(RARITY_LABEL_KEY[
+                              MATERIAL_BY_ID[result.material].rarity
+                            ])}{' '}
+                            · ×
+                            {materialCount(state.materials, result.material)}
+                          </p>
+                          <p className="fishing-result__desc">
+                            {pick(MATERIAL_BY_ID[result.material].description)}
+                          </p>
+                          <p className="fishing-unlock">
+                            {t('material_added')}
+                          </p>
+                          <button className="fishing-brew-link" onClick={onGoToNether}>{t('brew_go_nether')}</button>
                         </div>
                       </>
                     ) : (

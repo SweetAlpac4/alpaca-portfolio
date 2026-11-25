@@ -1,0 +1,668 @@
+/* Nether workshop: the same square pixel UI, with basalt and copper surfaces. */
+.nether-overlay {
+  position: fixed; inset: 0; z-index: 82; display: grid; place-items: center;
+  padding: 16px; background: #100d15db; backdrop-filter: blur(6px);
+}
+.nether-game {
+  width: min(1080px, 100%); max-height: 94dvh; display: flex; flex-direction: column;
+  color: #f1e5d5; background: #211d26; border: 3px solid #0e1017;
+  box-shadow: inset 1px 1px #72544c, 0 20px 60px #130b1266; outline: none;
+}
+.nether-game__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #4e373a;
+}
+.nether-eyebrow {
+  color: #dfaa79;
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.nether-game h2 {
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  line-height: 1.4;
+  margin: 4px 0;
+  color: #f8dab0;
+}
+.nether-game__head > div > p:last-child {
+  color: #bcb0b2;
+  font-size: .8rem;
+}
+.nether-close {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  background: #372a33;
+  border: 2px solid #110f17;
+  color: #f4d2bd;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+.nether-game__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 10px 22px;
+  color: #bcb0b2;
+  font-size: .75rem;
+}
+.nether-game__stats strong {
+  color: #f0cca1;
+  margin-left: 6px;
+}
+.nether-title {
+  color: #a6dfd4;
+}
+.nether-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 0 22px;
+}
+.nether-tabs button {
+  min-height: 42px;
+  padding: 8px;
+  background: #2c252d;
+  border: 1px solid #594047;
+  color: #c5b6b2;
+  font-size: .8rem;
+  cursor: pointer;
+}
+.nether-tabs button[aria-selected="true"] {
+  color: #ffe0b3;
+  border-color: #c28957;
+  background: #49332e;
+  box-shadow: inset 0 -2px #d9a16d;
+}
+.nether-tabs button:disabled {
+  cursor: default;
+  opacity: .65;
+}
+.nether-tabs span {
+  color: #ae9f9d;
+  font-size: .7rem;
+}
+.nether-game__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 22px 18px;
+  min-height: 0;
+}
+.nether-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.nether-world {
+  position: relative;
+  min-height: 320px;
+  background: #261a25;
+  border: 1px solid #815747;
+  overflow: hidden;
+  display: grid;
+  align-items: center;
+}
+.nether-world.is-hot {
+  border-color: #ed9671;
+}
+.nether-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+.nether-world__label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #f0c598;
+  font-size: .7rem;
+  text-shadow: 1px 2px #211923;
+}
+.nether-world__timer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 8px;
+  border: 1px solid #a77758;
+  background: #201c29e6;
+  color: #ffe4af;
+  font-size: 1rem;
+}
+.nether-world__caption {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 20px);
+  text-align: center;
+  font-size: .72rem;
+  background: #201b28e8;
+  padding: 6px 9px;
+  border: 1px solid #735049;
+}
+.nether-console {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #50373d;
+  background: #181820;
+  min-width: 0;
+}
+.nether-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #d3b09a;
+  font-size: .75rem;
+}
+.nether-console select {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 28px 10px 9px;
+  font-size: .75rem;
+  border: 1px solid #76564a;
+  border-radius: 0;
+  background: #342a30;
+  color: #f5dcc0;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #dab08b 50%), linear-gradient(135deg, #dab08b 50%, transparent 50%);
+  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.nether-ingredients {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.nether-ingredients > div {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 5px;
+  padding: 8px 4px;
+  background: #2c292d;
+  border: 1px solid #52604d;
+  text-align: center;
+  font-size: .65rem;
+}
+.nether-ingredients .is-missing {
+  border-color: #5d3b3d;
+}
+.nether-ingredients .is-missing strong {
+  color: #e5a39a;
+}
+.nether-ingredients svg {
+  width: 30px;
+  height: 30px;
+}
+.nether-ingredients span {
+  min-height: 2.8em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.nether-ingredients strong {
+  color: #c4d29e;
+  font-size: .75rem;
+}
+.nether-help {
+  font-size: .75rem;
+  line-height: 1.8;
+  color: #bdb2b5;
+}
+.nether-reward {
+  font-size: .8rem;
+  color: #e3ba78;
+  line-height: 1.6;
+}
+.nether-button {
+  min-height: 44px;
+  padding: 10px 12px;
+  background: #8c5139;
+  border: 2px solid #100f17;
+  box-shadow: inset 2px 2px #c58d63, inset -2px -2px #53312c;
+  color: #fff0d3;
+  font-size: .8rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.nether-button:hover:not(:disabled) {
+  background: #a46343;
+}
+.nether-button:active:not(:disabled) {
+  box-shadow: inset 2px 2px #53312c;
+}
+.nether-button--secondary {
+  background: #3c4248;
+  box-shadow: inset 2px 2px #77817e, inset -2px -2px #282933;
+}
+.nether-button--secondary:hover:not(:disabled) {
+  background: #50565b;
+}
+.nether-button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.nether-console > .nether-button:first-of-type {
+  margin-top: auto;
+}
+.nether-link {
+  padding: 5px;
+  min-height: 30px;
+  border: 0;
+  background: transparent;
+  color: #d4b9a2;
+  font-size: .73rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.nether-warning {
+  color: #f2a891;
+  font-size: .75rem;
+}
+.nether-gauge {
+  position: relative;
+  height: 15px;
+  background: #10141a;
+  border: 1px solid #625044;
+  margin: 8px 0 5px;
+}
+.nether-gauge__safe {
+  position: absolute;
+  left: 25%;
+  width: 50%;
+  top: 0;
+  bottom: 0;
+  background: #46654b66;
+  border-inline: 1px solid #a8c898;
+}
+.nether-gauge__fill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 0;
+  background: #a9bb83;
+}
+.nether-gauge.is-danger .nether-gauge__fill {
+  background: #ed8a63;
+}
+.nether-heat small {
+  color: #b7a6a2;
+  font-size: .65rem;
+  line-height: 1.6;
+  display: block;
+}
+.nether-steps {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 4px;
+}
+.nether-steps span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid #514349;
+  background: #26232c;
+  color: #a1979b;
+  font-size: .65rem;
+}
+.nether-steps .is-current {
+  outline: 1px solid #edc28e;
+  outline-offset: 1px;
+}
+.nether-steps .is-hit {
+  background: #385147;
+  color: #c3e5b6;
+}
+.nether-steps .is-miss {
+  background: #603b3f;
+  color: #f5a9a1;
+}
+.nether-timing-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .82rem;
+  color: #eed8be;
+}
+.nether-timing-label svg {
+  width: 36px;
+  height: 36px;
+}
+.nether-timing-label small {
+  display: block;
+  font-size: .67rem;
+  color: #b2a2a7;
+}
+.nether-timing {
+  position: relative;
+  height: 30px;
+  margin: 2px 3px;
+  background: repeating-linear-gradient(90deg, #2d2931 0 9%, #42353a 9% 10%);
+  border: 2px solid #0e1018;
+  box-shadow: 0 0 0 1px #75564a;
+}
+.nether-timing__target {
+  position: absolute;
+  left: 35%;
+  width: 30%;
+  top: 0;
+  bottom: 0;
+  background: #b48e48;
+  border-inline: 2px solid #f8dba0;
+}
+.nether-timing__marker {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 4px;
+  transform: translateX(-50%);
+  background: #fff3cf;
+  box-shadow: 2px 0 #292432;
+}
+.nether-feedback {
+  min-height: 2.8em;
+  font-size: .72rem;
+  color: #e0bc91;
+  line-height: 1.5;
+}
+.nether-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.nether-actions kbd {
+  display: block;
+  font: inherit;
+  font-size: .6rem;
+  color: #e4c9af;
+  margin-top: 3px;
+}
+.nether-combo {
+  font-size: .73rem;
+  color: #ecb879;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.nether-combo span {
+  color: #b7a7ac;
+}
+.nether-result {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+.nether-result h3 {
+  color: #eac390;
+  font-size: 1.35rem;
+}
+.nether-result__score {
+  color: #f9dfae;
+  font-size: 2.8rem;
+  line-height: 1.2;
+}
+.nether-result__score small {
+  font-size: 1rem;
+  color: #a99a9d;
+  font-weight: 400;
+}
+.nether-result > p:not(.nether-eyebrow):not(.nether-reward) {
+  color: #b8b3b3;
+  font-size: .75rem;
+}
+.nether-result > .nether-button {
+  margin-top: auto;
+}
+.nether-result--perfect h3 {
+  color: #cbe5ad;
+}
+.nether-result--ruined h3 {
+  color: #efa392;
+}
+.nether-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #4b363c;
+  color: #b9a8a8;
+  font-size: .65rem;
+}
+.nether-footer > p {
+  max-width: 68ch;
+  line-height: 1.7;
+}
+.nether-cosmetic {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.nether-cosmetic input {
+  accent-color: #8ecac0;
+  width: 17px;
+  height: 17px;
+}
+.nether-cosmetic span {
+  color: #ceb790;
+}
+.nether-bag {
+  display: grid;
+  gap: 18px;
+}
+.nether-bag h3 {
+  color: #efcda6;
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+.nether-bag > div > p {
+  color: #b9acb1;
+  font-size: .78rem;
+}
+.nether-bag__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.nether-material {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  background: #2d252d;
+  border: 1px solid #563b41;
+}
+.nether-material > svg {
+  flex: 0 0 44px;
+  height: 44px;
+}
+.nether-material h4 {
+  color: #ecd4b5;
+  font-size: .85rem;
+}
+.nether-material p {
+  font-size: .7rem;
+  color: #bfaeb0;
+  line-height: 1.7;
+}
+.nether-material small {
+  color: #b99a7e;
+  font-size: .65rem;
+}
+.nether-material > strong {
+  margin-left: auto;
+  color: #f4cf91;
+  font-size: 1rem;
+}
+.nether-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  padding: 16px;
+  border: 1px solid #5c443c;
+}
+.nether-bag > .nether-button {
+  justify-self: start;
+}
+.nether-game :is(button, select, input):focus-visible {
+  outline: 2px solid #f5d69c;
+  outline-offset: 3px;
+}
+.fishing-brew-link {
+  background: #392a2d;
+  border: 1px solid #99694f;
+  color: #f2c99b;
+  font-size: .7rem;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+.fishing-brew-link:disabled {
+  opacity: .5;
+  cursor: default;
+}
+.fishing-result--material {
+  border-color: #a56c4a;
+  background: #4b2f2c55;
+}
+.fishing-result__icon--material {
+  background: #743f3833;
+}
+.fishing-result__icon--material svg {
+  width: 48px;
+  height: 48px;
+}
+.book-filters {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 14px;
+}
+.book-filters button {
+  background: #242c25;
+  color: #bdcbb9;
+  border: 1px solid #50634b;
+  padding: 8px 12px;
+  font-size: .75rem;
+  cursor: pointer;
+}
+.book-filters button[aria-pressed="true"] {
+  color: #f1e3ac;
+  border-color: #c4a75c;
+  background: #45442a;
+}
+
+@media (max-width: 760px) {
+  .nether-overlay {
+    padding: 8px;
+  }
+  .nether-game {
+    max-height: 96dvh;
+  }
+  .nether-game__head {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+  .nether-game__head > div > p:last-child {
+    font-size: .7rem;
+  }
+  .nether-eyebrow {
+    font-size: .6rem;
+  }
+  .nether-game__stats {
+    padding: 8px 14px;
+    gap: 4px 14px;
+    font-size: .65rem;
+  }
+  .nether-tabs {
+    padding: 0 14px;
+  }
+  .nether-tabs button {
+    font-size: .72rem;
+  }
+  .nether-game__body {
+    padding: 12px 14px;
+  }
+  .nether-workbench {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .nether-world {
+    min-height: 0;
+  }
+  .nether-world__label {
+    font-size: .6rem;
+    top: 8px;
+    left: 8px;
+  }
+  .nether-world__caption {
+    font-size: .6rem;
+    bottom: 8px;
+    padding: 4px 6px;
+  }
+  .nether-console {
+    padding: 12px;
+    gap: 10px;
+  }
+  .nether-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .nether-bag__grid {
+    grid-template-columns: 1fr;
+  }
+  .nether-material {
+    padding: 10px;
+    gap: 8px;
+  }
+  .nether-material > svg {
+    flex-basis: 36px;
+    height: 36px;
+  }
+  .nether-material h4 {
+    font-size: .75rem;
+  }
+  .hotbar__frame {
+    gap: 2px;
+  }
+  .hotbar__slot {
+    width: 32px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+  .hotbar__slot img {
+    width: 24px;
+    height: 24px;
+  }
+}
+@media (max-width: 360px) {
+  .hotbar__slot {
+    width: 29px;
+    height: 32px;
+  }
+  .nether-game__head h2 {
+    font-size: 1.05rem;
+  }
+  .nether-ingredients span {
+    font-size: .6rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nether-game *, .nether-overlay {
+    animation: none !important;
+    transition: none !important;
+  }
+}

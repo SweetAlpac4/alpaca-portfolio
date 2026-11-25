@@ -13,7 +13,9 @@ import { AchievementToast } from './components/AchievementToast'
 import { useAchievements } from './components/AchievementProvider'
 import { FishingGame } from './components/FishingGame'
 import { useFishing } from './components/FishingProvider'
-import { ARTIFACTS } from './lib/achievements'
+import { NetherGame } from './components/NetherGame'
+import { GameMilestones } from './components/GameMilestones'
+import { ARTIFACTS, ACHIEVEMENTS } from './lib/achievements'
 import { Overworld } from './sections/Overworld'
 import { Cave } from './sections/Cave'
 import { DeepDark } from './sections/DeepDark'
@@ -26,7 +28,7 @@ export function Portfolio() {
   const { data, isLoading } = useContent()
   const { start, setTrack } = useMusic()
   const { unlocked, announcement } = useAchievements()
-  const { selectedRod, state: fishingState } = useFishing()
+  const { state: fishingState, selectedRod } = useFishing()
 
   const content = data ?? fallbackContent
   const worldRef = useRef<HTMLDivElement>(null)
@@ -40,12 +42,27 @@ export function Portfolio() {
   const [debug, setDebug] = useState(false)
   const [bookOpen, setBookOpen] = useState(false)
   const [fishingOpen, setFishingOpen] = useState(false)
+  const [netherOpen, setNetherOpen] = useState(false)
   const [viewport, setViewport] = useState({ w: 0, h: 0 })
 
   const artifactsFound = ARTIFACTS.filter((achievement) =>
     unlocked.has(achievement.id),
   ).length
   const closeBook = useCallback(() => setBookOpen(false), [])
+  const closeNether = useCallback(() => setNetherOpen(false), [])
+  const openNether = useCallback(() => {
+    if (!entered || active !== 3) return
+    setFishingOpen(false)
+    setBookOpen(false)
+    setNetherOpen(true)
+  }, [active, entered])
+  const openFishing = useCallback(() => {
+    if (!entered || active !== 0) return
+    setNetherOpen(false)
+    setBookOpen(false)
+    setFishingOpen(true)
+  }, [active, entered])
+
   const closeFishing = useCallback(() => setFishingOpen(false), [])
 
   const goTo = useCallback((index: number) => {
@@ -53,6 +70,19 @@ export function Portfolio() {
     if (!el) return
     el.scrollTo({ top: index * el.clientHeight, behavior: 'smooth' })
   }, [])
+
+  const goToNether = useCallback(() => {
+    setFishingOpen(false)
+    setNetherOpen(false)
+    setBookOpen(false)
+    goTo(3)
+  }, [goTo])
+  const goToOverworld = useCallback(() => {
+    setFishingOpen(false)
+    setNetherOpen(false)
+    setBookOpen(false)
+    goTo(0)
+  }, [goTo])
 
   const onScroll = useCallback(() => {
     const el = worldRef.current
@@ -90,9 +120,15 @@ export function Portfolio() {
       const target = event.target as HTMLElement | null
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return
       if (target?.isContentEditable) return
+      if (!entered || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return
       if (event.key === 'F3') {
         event.preventDefault()
         setDebug((current) => !current)
+        return
+      }
+
+      if (netherOpen) {
+        if (event.code === 'KeyN') { event.preventDefault(); setNetherOpen(false) }
         return
       }
 
@@ -112,10 +148,11 @@ export function Portfolio() {
         return
       }
 
-      if (event.key === 'f' || event.key === 'F') {
-        if (event.metaKey || event.ctrlKey || event.altKey) return
+      if (event.code === 'KeyN' && active === 3) { event.preventDefault(); openNether(); return }
+
+      if ((event.key === 'f' || event.key === 'F') && active === 0) {
         event.preventDefault()
-        setFishingOpen(true)
+        openFishing()
         return
       }
 
@@ -131,7 +168,7 @@ export function Portfolio() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [bookOpen, fishingOpen, goTo])
+  }, [active, bookOpen, fishingOpen, netherOpen, entered, openNether, openFishing, goTo])
 
   useEffect(() => {
     const update = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
@@ -159,6 +196,7 @@ export function Portfolio() {
 
   return (
     <>
+      <GameMilestones />
       {!entered && (
         <LoadingScreen
           ready={!isLoading}
@@ -188,18 +226,20 @@ export function Portfolio() {
         />
       </div>
 
-      <LanguageToggle />
+      <LanguageToggle
+        onOpenBook={() => setBookOpen(true)}
+        found={unlocked.size}
+        total={ACHIEVEMENTS.length}
+        activeBiome={entered ? active : -1}
+        onOpenFishing={openFishing}
+        onOpenNether={openNether}
+        rodColor={selectedRod.color}
+      />
       <MusicControls />
       <Hotbar
         active={active}
         progress={progress}
         onSelect={goTo}
-        onOpenBook={() => setBookOpen(true)}
-        onOpenFishing={() => setFishingOpen(true)}
-        artifactsFound={artifactsFound}
-        artifactTotal={ARTIFACTS.length}
-        selectedRod={selectedRod}
-        fishCaught={fishingState.stats.catches}
       />
       <AdvancementToast
         show={toast}
@@ -208,7 +248,8 @@ export function Portfolio() {
       />
       <AchievementToast achievement={announcement} offset={toast} />
       <AchievementBook open={bookOpen} onClose={closeBook} />
-      {fishingOpen && <FishingGame onClose={closeFishing} />}
+      {fishingOpen && <FishingGame onClose={closeFishing} onGoToNether={goToNether} />}
+      {netherOpen && <NetherGame onClose={closeNether} onGoToFishing={goToOverworld} />}
 
       {debug && (
         <pre className="debug">
@@ -222,7 +263,8 @@ Viewport: ${viewport.w} x ${viewport.h}
 Fish: ${fishingState.stats.catches} caught / ${fishingState.chest.length} in chest
 F3: debug screen on
 E: advancement book
-F: fishing`}
+F: fishing
+N: Nether Brewmaster`}
         </pre>
       )}
     </>

@@ -95,26 +95,32 @@ public/
 
 ## Achievement book
 
-- Buka lewat slot buku di hotbar atau tekan `E`.
+- Buka lewat tombol buku di bagian atas atau tekan `E`.
 - Ada **6 hidden artifact** di biome berbeda. Klik item yang berkilau untuk
   mendapatkan advancement.
 - Progres disimpan di `localStorage` browser dengan key
   `portfolio-achievements-v1` — tanpa akun, tanpa database, dan hanya berlaku
-  di browser/perangkat itu. Reset tersedia di dalam buku.
-- Kalau keenam artifact ditemukan, akan unlock **Curious Explorer** dan
-  **secret ending** di Credits.
+  di browser/perangkat itu. Reset tersedia di dalam buku. Milestone game dicek
+  kembali dari progres game saat reload atau progres berubah.
+- Keenam artifact membuka **Curious Explorer**. **Secret ending dinonaktifkan**
+  lewat `src/lib/features.ts` sampai semua biome punya minigame. Progres artefak
+  lama tetap disimpan.
+- Ada 13 milestone game: tangkapan pertama/25 tangkapan, semua 5 pancing,
+  12 tangkapan reguler, Echo Fish, bahan Rift pertama/6 jenis bahan, racikan
+  berhasil pertama, Perfect pertama/5 Perfect, semua resep terbuka/berhasil
+  diracik, dan 9 takaran tepat tanpa overheat.
+- Buku punya filter Semua, Artefak, dan Minigame. Milestone yang sudah
+  terpenuhi dari save lama langsung dikenali saat halaman dibuka.
 - Ini terpisah dari tab **Achievements** di Deep Dark, yang berisi prestasi
   asli/sertifikat dari Supabase.
 
 ## Fishing mini-game
 
-- Buka lewat slot pancing di hotbar atau tekan `F`.
+- Minigame hanya bisa dibuka di biome Overworld, lewat ikon pancing di samping Achievement Book atau tekan `F` saat berada di Overworld.
 - Alur: **Cast** → tunggu tanda `!` → tekan **Reel** → tahan tombol untuk menarik
   dan lepas sebelum tension menyentuh batas. Catch progress harus mencapai 100%.
-- Pemandangan kolam mengikuti jam lokal perangkat: **Malam**, **Fajar**,
-  **Siang**, atau **Senja**. Saat dibuka, ada transisi singkat dari gelap ke
-  fase saat ini; khusus fajar, matahari terbit dengan glow. Jam dan fase tampil
-  di pojok kolam.
+- Pemandangan pixel-art mengikuti jam lokal perangkat: **Malam**, **Fajar**,
+  **Siang**, atau **Senja**, dengan warna lanskap dan pantulan yang sesuai.
 - Pancing digambar di foreground (kanan bawah). Saat menarik, pancing memantul,
   senar menegang, bobber bergerak ke arah pancing, dan siluet ikan terlihat
   berjuang di bawah air.
@@ -135,6 +141,62 @@ public/
   di key `portfolio-secrets-v1`. Belum ada sumber item ini di situs; helper
   `grantSecretItem('echo_shard')` sudah disiapkan untuk mini-game Deep Dark
   berikutnya. Selama item itu belum ada, Echo Fish tetap terkunci.
+
+
+## Nether Brewmaster
+
+- Minigame hanya bisa dibuka di biome Nether, lewat ikon brewing di samping Achievement Book atau tekan `N` saat berada di Nether.
+  `Esc` menutup game. Tombol hotbar bawah khusus navigasi biome.
+- Loop: **mancing → tangkapan bahan Rift → brewing → bonus mancing**.
+  Bahan menggantikan ikan pada tangkapan itu, bukan bonus bersama ikan.
+- Enam bahan: Nether Wart, Glowstone Dust, Nether Quartz, Magma Cream,
+  Blaze Powder, Ghast Tear. Peluang bahan dasar 14%, naik dengan luck pancing;
+  Umpan Bara menambah 22 poin persentase. Luck pancing juga menaikkan peluang
+  bahan langka. Tangkapan Rift punya efek merah pada air.
+- Bahan masuk **Tas Racikan**, terpisah dari 54 slot ikan dan 13 entri jurnal
+  ikan. Penemuan bahan tercatat permanen setelah bahan dipakai. Reset fishing
+  menghapus ikan/pancing/statistik; tas, bonus, dan klaim starter tetap ada.
+- Klaim starter kit sekali untuk bahan resep pertama. Satu ronde memakai
+  3 bahan, berlangsung **36 detik**: 3 takaran untuk masing-masing bahan.
+  Klik **Tambahkan** / `Space` saat penanda berada di zona emas (35–65%).
+  Klik **Buang panas** / `V` untuk menurunkan suhu 24%; cooldown 1,6 detik.
+  Pertahankan suhu 25–75%. Ronde dijeda saat tab browser tidak aktif.
+- Skor: 70% ketepatan timing + 30% durasi suhu aman, dikurangi 4 poin setiap
+  overheat. Kualitas: Gagal <35, Canggung 35–61, Bagus 62–87, Sempurna ≥88.
+  Miss mengakhiri kombo; klik berulang dalam takaran yang sama tidak dihitung.
+- Tutup/reload sebelum selesai: **refund semua bahan**. Gagal juga refund
+  semua bahan, Canggung refund bahan pertama. Ronde selesai membuka resep
+  setelah total 1, 3, dan 5 ronde, termasuk percobaan gagal.
+
+| Resep | Terbuka setelah | Hadiah kualitas Bagus |
+| --- | --- | --- |
+| Pengalaman | Awal | Umpan Bara, 5 lemparan |
+| Tahan Api | 1 ronde | Umpan Bara, 8 lemparan |
+| Kekuatan | 3 ronde | Ramuan Hoki, 5 lemparan |
+| Keberuntungan | 5 ronde | Ramuan Hoki, 8 lemparan |
+
+- Sempurna menambah 2 lemparan bonus dan 1 **Bara Nether**. Lima Sempurna
+  membuka title Brewmaster dan toggle kosmetik **Api Jiwa**. Bara Nether
+  disimpan sebagai koleksi untuk update berikutnya, belum membuka ending.
+- Bonus aktif otomatis, jumlahnya bisa ditumpuk, dan berkurang **sekali saat
+  mulai melempar**, termasuk lemparan yang gagal atau dibatalkan. Ramuan Hoki
+  menambah 0,8 luck pada pemilihan rarity ikan; tidak mengubah kapasitas peti.
+- Resep, rekor skor, dan kosmetik tersimpan di `portfolio-nether-v1`.
+  Tas, bonus, starter kit, dan reservasi bahan ada di `portfolio-fishing-v1`.
+  Save versi lama dimigrasikan tanpa menghapus progres.
+
+### Validasi lokal
+
+```sh
+npm run test:games   # Node 22.6+ dengan dukungan TypeScript stripping
+npm run build       # typecheck + Vite production build
+npm run dev         # cek manual: F / N / E
+```
+
+Tes logika mencakup migrasi save, tangkapan bahan vs ikan, bonus per lemparan,
+reservasi/refund bahan, cooldown, scoring, milestone, dan flag ending.
+Untuk cek UI: klaim starter, coba ronde dengan keyboard/touch, cek peti/tas,
+reload saat brewing, periksa timer saat pindah tab, dan gunakan viewport mobile. Tombol dari game untuk biome lain akan menavigasi ke biome tersebut; minigame harus dibuka di sana.
 
 ## Musik
 

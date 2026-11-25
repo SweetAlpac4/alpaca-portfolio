@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,20 +17,31 @@ import {
   loadFishingState,
   saveFishingState,
   speciesCount,
+  spendCastEffects,
+  reserveIngredients,
+  settleIngredients,
+  type FishingEffects,
+  type MaterialBag,
   type FishCatch,
   type FishingState,
   type RodDef,
   type RodId,
 } from '../lib/fishing'
+import type { MaterialId } from '../lib/materials'
 
 type FishingContextValue = {
   state: FishingState
   selectedRod: RodDef
   unlockedRods: RodDef[]
   speciesFound: number
+  materialTypesFound: number
   chestFull: boolean
-  recordCast: () => void
+  recordCast: () => FishingEffects
+  claimStarterKit: () => void
+  reserveBrew: (id: string, cost: MaterialBag) => boolean
+  settleBrew: (id: string, refund: MaterialBag, reward: FishingEffects) => boolean
   recordCatch: (fish: FishCatch, perfect: boolean) => RodDef[]
+  recordMaterial: (material: MaterialId, amount?: number, perfect?: boolean) => void
   recordEscape: () => void
   selectRod: (id: RodId) => void
   releaseFish: (id: string) => void
@@ -48,15 +60,35 @@ export function FishingProvider({ children }: { children: ReactNode }) {
     saveFishingState(next)
   }, [])
 
+  useEffect(() => { saveFishingState(stateRef.current) }, [])
+
   const recordCast = useCallback(() => {
     const current = stateRef.current
-    commit({
-      ...current,
-      stats: {
-        ...current.stats,
-        casts: current.stats.casts + 1,
-      },
-    })
+    commit(spendCastEffects(current))
+    return { ...current.effects }
+  }, [commit])
+
+  const claimStarterKit = useCallback(() => {
+    const current = stateRef.current
+    if (current.starterClaimed) return
+    const materials = { ...current.materials }
+    const kit: MaterialId[] = ['nether_wart', 'glowstone_dust', 'nether_quartz']
+    for (const id of kit) materials[id] = (materials[id] ?? 0) + 1
+    commit({ ...current, materials, materialsFound: Array.from(new Set([...current.materialsFound, ...kit])), starterClaimed: true })
+  }, [commit])
+
+  const reserveBrew = useCallback((id: string, cost: MaterialBag) => {
+    const next = reserveIngredients(stateRef.current, id, cost)
+    if (!next) return false
+    commit(next)
+    return true
+  }, [commit])
+
+  const settleBrew = useCallback((id: string, refund: MaterialBag, reward: FishingEffects) => {
+    const next = settleIngredients(stateRef.current, id, refund, reward)
+    if (!next) return false
+    commit(next)
+    return true
   }, [commit])
 
   const recordCatch = useCallback(
@@ -109,6 +141,30 @@ export function FishingProvider({ children }: { children: ReactNode }) {
     [commit],
   )
 
+  const recordMaterial = useCallback(
+    (material: MaterialId, amount = 1, perfect = false) => {
+      const current = stateRef.current
+      const nextAmount =
+        Math.max(0, Math.floor(current.materials[material] ?? 0)) +
+        Math.max(1, Math.floor(amount))
+      commit({
+        ...current,
+        materials: {
+          ...current.materials,
+          [material]: nextAmount,
+        },
+        materialsFound: Array.from(new Set([...current.materialsFound, material])),
+        materialCatches: current.materialCatches + 1,
+        stats: {
+          ...current.stats,
+          currentStreak: perfect ? current.stats.currentStreak + 1 : 0,
+          bestStreak: Math.max(current.stats.bestStreak, perfect ? current.stats.currentStreak + 1 : 0),
+        },
+      })
+    },
+    [commit],
+  )
+
   const recordEscape = useCallback(() => {
     const current = stateRef.current
     commit({
@@ -142,7 +198,8 @@ export function FishingProvider({ children }: { children: ReactNode }) {
   )
 
   const reset = useCallback(() => {
-    commit(createInitialFishingState())
+    const { materials, materialsFound, materialCatches, starterClaimed, effects, pendingBrew } = stateRef.current
+    commit({ ...createInitialFishingState(), materials, materialsFound, materialCatches, starterClaimed, effects, pendingBrew })
   }, [commit])
 
   const value = useMemo<FishingContextValue>(() => {
@@ -152,17 +209,26 @@ export function FishingProvider({ children }: { children: ReactNode }) {
       selectedRod,
       unlockedRods: RODS.filter((rod) => state.rods.includes(rod.id)),
       speciesFound: speciesCount(state),
+      materialTypesFound: state.materialsFound.length,
       chestFull: state.chest.length >= MAX_CHEST_SIZE,
       recordCast,
+      claimStarterKit,
+      reserveBrew,
+      settleBrew,
       recordCatch,
+      recordMaterial,
       recordEscape,
       selectRod,
       releaseFish,
       reset,
     }
   }, [
+    claimStarterKit,
+    reserveBrew,
+    settleBrew,
     recordCast,
     recordCatch,
+    recordMaterial,
     recordEscape,
     releaseFish,
     reset,

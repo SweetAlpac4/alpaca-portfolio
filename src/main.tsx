@@ -9,6 +9,7 @@ import './styles/layout.css'
 import './styles/sections.css'
 import './styles/achievements.css'
 import './styles/fishing.css'
+import './styles/nether.css'
 import './styles/admin.css'
 
 const queryClient = new QueryClient({

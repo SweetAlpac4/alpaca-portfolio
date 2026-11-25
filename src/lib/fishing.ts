@@ -1,5 +1,11 @@
 import type { Localized } from '../data/types'
 import type { TranslationKey } from '../i18n'
+import {
+  MATERIAL_CATCH_CHANCE,
+  isMaterialId,
+  rollMaterial,
+  type MaterialId,
+} from './materials.ts'
 
 export type RodId = 'basic' | 'sturdy' | 'lucky' | 'golden' | 'prismarine'
 export type FishId =
@@ -60,6 +66,10 @@ export type CatchRoll = {
   size: FishSize
 }
 
+export type FishingRoll =
+  | { kind: 'fish'; roll: CatchRoll }
+  | { kind: 'material'; material: MaterialId; amount: number }
+
 export type FishCatch = CatchRoll & {
   id: string
   rod: RodId
@@ -82,12 +92,21 @@ export type FishingStats = {
   totalWeight: number
 }
 
+export type FishingEffects = { emberBait: number; luck: number }
+export type MaterialBag = Partial<Record<MaterialId, number>>
+
 export type FishingState = {
   version: 1
   rods: RodId[]
   selectedRod: RodId
   chest: FishCatch[]
   discovered: Partial<Record<FishId, FishRecord>>
+  materials: MaterialBag
+  materialsFound: MaterialId[]
+  materialCatches: number
+  starterClaimed: boolean
+  effects: FishingEffects
+  pendingBrew: { id: string; cost: MaterialBag } | null
   stats: FishingStats
 }
 
@@ -390,6 +409,12 @@ export function createInitialFishingState(): FishingState {
     selectedRod: 'basic',
     chest: [],
     discovered: {},
+    materials: {},
+    materialsFound: [],
+    materialCatches: 0,
+    starterClaimed: false,
+    effects: { emberBait: 0, luck: 0 },
+    pendingBrew: null,
     stats: {
       casts: 0,
       catches: 0,
@@ -425,6 +450,31 @@ export function rodRequirementProgress(state: FishingState, rod: RodDef) {
       ? state.stats.catches
       : speciesCount(state)
   return { current, target: rod.requirement.count }
+}
+
+export function rollFishingCatch(
+  rod: RodDef,
+  hasSecretBait: boolean,
+  secretAlreadyCaught: boolean,
+  effects: FishingEffects = { emberBait: 0, luck: 0 },
+): FishingRoll {
+  if (hasSecretBait && !secretAlreadyCaught) {
+    return { kind: 'fish', roll: rollForFish(FISH_BY_ID.echo_fish) }
+  }
+
+  const materialChance = Math.min(
+    0.5,
+    MATERIAL_CATCH_CHANCE + rod.luck * 0.05 + (effects.emberBait > 0 ? 0.22 : 0),
+  )
+  if (Math.random() < materialChance) {
+    return {
+      kind: 'material',
+      material: rollMaterial(rod.luck),
+      amount: 1,
+    }
+  }
+
+  return { kind: 'fish', roll: rollCatch({ ...rod, luck: rod.luck + (effects.luck > 0 ? 0.8 : 0) }, false, false) }
 }
 
 export function rollCatch(
@@ -528,6 +578,25 @@ export function loadFishingState(): FishingState {
       }
     }
 
+    const materials: Partial<Record<MaterialId, number>> = {}
+    if (parsed.materials && typeof parsed.materials === 'object') {
+      for (const [key, value] of Object.entries(parsed.materials)) {
+        if (!isMaterialId(key) || typeof value !== 'number') continue
+        if (!Number.isFinite(value)) continue
+        materials[key] = Math.max(0, Math.floor(value))
+      }
+    }
+
+    // Restore escrow on reload: leaving an unfinished brew never loses ingredients.
+    if (parsed.pendingBrew?.cost && typeof parsed.pendingBrew.cost === 'object') {
+      for (const [id, amount] of Object.entries(parsed.pendingBrew.cost)) {
+        if (isMaterialId(id)) materials[id] = (materials[id] ?? 0) + safeCount(amount)
+      }
+    }
+    const materialsFound = Array.from(new Set([
+      ...(Array.isArray(parsed.materialsFound) ? parsed.materialsFound.filter(isMaterialId) : []),
+      ...Object.keys(materials).filter((id) => isMaterialId(id) && (materials[id] ?? 0) > 0) as MaterialId[],
+    ]))
     const stats = { ...initial.stats }
     if (parsed.stats && typeof parsed.stats === 'object') {
       for (const key of Object.keys(stats) as (keyof FishingStats)[]) {
@@ -544,6 +613,12 @@ export function loadFishingState(): FishingState {
       selectedRod,
       chest,
       discovered,
+      materials,
+      materialsFound,
+      materialCatches: safeCount(parsed.materialCatches ?? Object.values(materials).reduce((sum, amount) => sum + amount, 0)),
+      starterClaimed: parsed.starterClaimed === true,
+      effects: { emberBait: safeCount(parsed.effects?.emberBait), luck: safeCount(parsed.effects?.luck) },
+      pendingBrew: null,
       stats,
     }
   } catch {
@@ -608,4 +683,42 @@ function isFishCatch(value: unknown): value is FishCatch {
     isRodId(fish.rod) &&
     typeof fish.caughtAt === 'number'
   )
+}
+
+export function safeCount(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0
+}
+
+export function spendCastEffects(state: FishingState): FishingState {
+  return {
+    ...state,
+    effects: { emberBait: Math.max(0, state.effects.emberBait - 1), luck: Math.max(0, state.effects.luck - 1) },
+    stats: { ...state.stats, casts: state.stats.casts + 1 },
+  }
+}
+
+export function reserveIngredients(state: FishingState, id: string, cost: MaterialBag): FishingState | null {
+  if (state.pendingBrew || !Object.keys(cost).length) return null
+  const materials = { ...state.materials }
+  for (const [key, amount] of Object.entries(cost)) {
+    if (!isMaterialId(key) || !Number.isInteger(amount) || amount < 1 || (materials[key] ?? 0) < amount) return null
+    materials[key] = (materials[key] ?? 0) - amount
+  }
+  return { ...state, materials, pendingBrew: { id, cost } }
+}
+
+export function settleIngredients(
+  state: FishingState, id: string, refund: MaterialBag, reward: FishingEffects,
+): FishingState | null {
+  if (state.pendingBrew?.id !== id) return null
+  const materials = { ...state.materials }
+  for (const [key, amount] of Object.entries(refund)) {
+    if (isMaterialId(key)) {
+      materials[key] = (materials[key] ?? 0) + Math.min(safeCount(amount), state.pendingBrew.cost[key] ?? 0)
+    }
+  }
+  return {
+    ...state, materials, pendingBrew: null,
+    effects: { emberBait: state.effects.emberBait + safeCount(reward.emberBait), luck: state.effects.luck + safeCount(reward.luck) },
+  }
 }

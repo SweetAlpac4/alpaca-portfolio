@@ -1,19 +1,3 @@
-/* ---------- fishing rod in the hotbar ---------- */
-
-.hotbar__slot--rod {
-  margin-left: 5px;
-  background: rgba(24, 62, 70, 0.62);
-}
-
-.hotbar__slot--rod:hover {
-  background: rgba(34, 96, 104, 0.82);
-}
-
-.hotbar__rod-icon {
-  width: 32px;
-  height: 32px;
-}
-
 /* ---------- fishing overlay ---------- */
 
 .fishing-overlay {
@@ -1056,11 +1040,6 @@
 /* ---------- responsive ---------- */
 
 @media (max-width: 760px) {
-  .hotbar__rod-icon {
-    width: 26px;
-    height: 26px;
-  }
-
   .fishing-overlay {
     align-items: end;
     padding: 10px;
@@ -1161,11 +1140,6 @@
 }
 
 @media (max-width: 420px) {
-  .hotbar__rod-icon {
-    width: 23px;
-    height: 23px;
-  }
-
   .fishing__tabs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
