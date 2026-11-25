@@ -21,12 +21,12 @@ import {
   rollCatch,
   type CatchRoll,
   type FishCatch,
-  type FishId,
   type RodDef,
 } from '../lib/fishing'
 import { hasSecretItem } from '../lib/secrets'
 import { useFishing } from './FishingProvider'
 import { FishIcon, RodIcon } from './FishingIcons'
+import { FishingScene } from './FishingScene'
 
 type Tab = 'cast' | 'chest' | 'journal' | 'rods'
 type Phase = 'idle' | 'casting' | 'waiting' | 'bite' | 'reeling' | 'result'
@@ -78,7 +78,6 @@ export function FishingGame({ onClose }: Props) {
   const [tension, setTension] = useState(0)
   const [progress, setProgress] = useState(0)
   const [holding, setHolding] = useState(false)
-  const [reelFish, setReelFish] = useState<FishId | null>(null)
   const [now, setNow] = useState(() => new Date())
   const [message, setMessage] = useState('')
   const [newRods, setNewRods] = useState<RodDef[]>([])
@@ -172,7 +171,6 @@ export function FishingGame({ onClose }: Props) {
       clearTimers()
       holdingRef.current = false
       setHolding(false)
-      setReelFish(null)
       recordEscape()
       setResult({ kind: 'escape', reason })
       setPhase('result')
@@ -191,7 +189,6 @@ export function FishingGame({ onClose }: Props) {
     clearTimers()
     holdingRef.current = false
     setHolding(false)
-    setReelFish(null)
     const fish: FishCatch = {
       ...roll,
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -227,7 +224,6 @@ export function FishingGame({ onClose }: Props) {
     finishedRef.current = false
     holdingRef.current = false
     setHolding(false)
-    setReelFish(null)
     recordCast()
     setPhase('casting')
 
@@ -268,7 +264,6 @@ export function FishingGame({ onClose }: Props) {
     dangerRef.current = 0
     setTension(0)
     setProgress(0)
-    setReelFish(roll.species)
     setPhase('reeling')
   }, [clearTimers, phase, selectedRod, state.discovered])
 
@@ -436,9 +431,6 @@ export function FishingGame({ onClose }: Props) {
     minute: '2-digit',
     hourCycle: 'h23',
   })
-  const bobberX = phase === 'reeling' ? 50 + progress * 0.22 : 50
-  const lineControlX = (79 + bobberX) / 2
-  const linePath = `M79 47 Q${lineControlX.toFixed(2)} 54 ${bobberX.toFixed(2)} 58`
 
   return (
     <div
@@ -457,7 +449,7 @@ export function FishingGame({ onClose }: Props) {
       >
         <header className="fishing__head">
           <div>
-            <p className="eyebrow">{t('fishing')}</p>
+            <p className="eyebrow">{t('fishing_location')}</p>
             <h2 id="fishing-title" className="fishing__title">
               {t('fishing')}
             </h2>
@@ -544,80 +536,35 @@ export function FishingGame({ onClose }: Props) {
               <div
                 className={`fishing-pond fishing-pond--${phase} fishing-pond--time-${timePhase}`}
               >
-                <div className="fishing-pond__sky" />
-                <div className="fishing-pond__night-veil" />
-                <div className="fishing-pond__dawn-glow" />
-                <div className="fishing-pond__sun" />
-                <div className="fishing-pond__time" aria-hidden="true">
+                <FishingScene
+                  phase={phase}
+                  timePhase={timePhase}
+                  progress={progress}
+                  holding={holding}
+                  rodColor={selectedRod.color}
+                />
+                <div className="fishing-pond__location" aria-hidden="true">
+                  <span>{t('fishing_location')}</span>
+                  <small>{t('fishing_location_sub')}</small>
+                </div>
+                <div className="fishing-pond__time">
                   <span className="fishing-pond__clock">{timeLabel}</span>
                   <span className="fishing-pond__time-phase">
                     {t(TIME_PHASE_KEY[timePhase])}
                   </span>
                 </div>
-                <div className="fishing-pond__water">
-                  <div className="fishing-ripple fishing-ripple--a" />
-                  <div className="fishing-ripple fishing-ripple--b" />
-                  <div
-                    className={`fishing-bobber${
-                      phase === 'bite' ? ' is-bite' : ''
-                    }${phase === 'reeling' ? ' is-reeling' : ''}`}
-                    style={{ left: `${bobberX}%` }}
-                  >
-                    <span className="fishing-bobber__top" />
-                    <span className="fishing-bobber__bottom" />
-                  </div>
-                  {phase === 'bite' && (
-                    <span className="fishing-bite">!</span>
-                  )}
-                  {phase === 'reeling' && reelFish && (
-                    <span
-                      className="fishing-reel-fish"
-                      style={{ left: `${bobberX}%` }}
-                    >
-                      <FishIcon species={reelFish} />
-                    </span>
-                  )}
-                  {phase === 'reeling' && (
-                    <>
-                      <span
-                        className="fishing-splash"
-                        style={{ left: `${bobberX}%` }}
-                      />
-                      <span
-                        className="fishing-spray fishing-spray--a"
-                        style={{ left: `calc(${bobberX}% - 14px)` }}
-                      />
-                      <span
-                        className="fishing-spray fishing-spray--b"
-                        style={{ left: `calc(${bobberX}% + 10px)` }}
-                      />
-                      <span
-                        className="fishing-spray fishing-spray--c"
-                        style={{ left: `calc(${bobberX}% - 2px)` }}
-                      />
-                    </>
-                  )}
+                {phase === 'bite' && <span className="fishing-bite" aria-hidden="true">!</span>}
+                <div className={`fishing-pond__caption${phase === 'bite' ? ' is-bite' : ''}`} aria-live="polite">
+                  {phase === 'idle' && t('fishing_scene_idle')}
+                  {phase === 'casting' && t('casting')}
+                  {phase === 'waiting' && t('waiting_bite')}
+                  {phase === 'bite' && t('bite')}
+                  {phase === 'reeling' && (holding ? t('reeling') : t('release_to_slack'))}
+                  {phase === 'result' && (result?.kind === 'catch' ? t('caught') : t('escaped'))}
                 </div>
-                <div className="fishing-pond__dock" />
-                <div
-                  className={`fishing-pond__rod${
-                    phase === 'reeling' ? ' is-reeling' : ''
-                  }${phase === 'reeling' && holding ? ' is-holding' : ''}`}
-                />
-                <svg
-                  className={`fishing-pond__line${
-                    phase === 'reeling' ? ' is-reeling' : ''
-                  }${holding ? ' is-holding' : ''}`}
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d={linePath} />
-                </svg>
               </div>
 
-              <div className="fishing-controls">
+              <div className={`fishing-controls fishing-controls--${phase}`}>
                 {message && <p className="fishing-warning">{message}</p>}
 
                 {phase === 'idle' && (
@@ -635,11 +582,11 @@ export function FishingGame({ onClose }: Props) {
                 )}
 
                 {phase === 'casting' && (
-                  <p className="fishing-status">{t('casting')}</p>
+                  <button type="button" className="mc-btn fishing-action" disabled>{t('casting')}</button>
                 )}
 
                 {phase === 'waiting' && (
-                  <p className="fishing-status">{t('waiting_bite')}</p>
+                  <button type="button" className="mc-btn fishing-action" disabled>{t('waiting_bite')}</button>
                 )}
 
                 {phase === 'bite' && (

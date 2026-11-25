@@ -82,6 +82,9 @@ const en = {
   secret_ending: 'You found every lost artifact. The world remembers.',
 
   fishing: 'Fishing',
+  fishing_location: 'Overworld Lake',
+  fishing_location_sub: 'A little break from the adventure',
+  fishing_scene_idle: 'Find your quiet. Cast a line.',
   fishing_sub: 'Cast, wait for a bite, and reel in your catch.',
   fishing_help:
     'Cast. Wait for the !. Then hold to reel and release before the line snaps.',
@@ -251,6 +254,9 @@ const id: Record<keyof typeof en, string> = {
   secret_ending: 'Kamu menemukan semua artefak yang hilang. Dunia mengingatnya.',
 
   fishing: 'Mancing',
+  fishing_location: 'Danau Overworld',
+  fishing_location_sub: 'Rehat sejenak dari petualangan',
+  fishing_scene_idle: 'Santai sejenak. Lempar pancingmu.',
   fishing_sub: 'Lempar pancing, tunggu gigitan, lalu tarik tangkapanmu.',
   fishing_help:
     'Lempar. Tunggu tanda !. Lalu tahan untuk menarik dan lepas sebelum senar putus.',
