@@ -14,6 +14,14 @@ export function PixelIcon({ name, className }: Props) {
       aria-hidden="true"
       focusable="false"
     >
+      {name === 'scale' && (
+        <>
+          <path fill="#32233e" d="M11 1h3v7h-2v3h-2v2H7v2H2v-5h2V6h3V3h4z" />
+          <path fill="#8b65aa" d="M11 2h2v5h-2v3H9v2H6v1H3v-3h2V7h3V4h3z" />
+          <path fill="#563f74" d="M12 4v3h-2v3H7v2H4v-1h2V9h2V7h2V4z" />
+          <path fill="#edd1ff" d="M9 4h2v1H9zM6 7h2v2H6z" />
+        </>
+      )}
       {name === 'book' && (
         <>
           <rect x="2" y="1" width="12" height="14" fill="#3b2416" />

@@ -301,3 +301,69 @@ test('endgame progression gates the ore, potion and Echo Fish', () => {
   saveFishingState(fishing)
   assert.equal(loadFishingState().wardenCasts, 5)
 })
+
+test('the dragon rescues at the latest checkpoint and golden rings give a boost', async () => {
+  const { fly, LEG_LENGTH, PASSAGES, startFlight } = await import('../src/lib/endFlight.ts')
+  const gate = PASSAGES[3]
+  const before = { ...startFlight(), x: gate.x - 14, y: gate.floor, checkpoint: LEG_LENGTH }
+  const rescue = fly(before, true, .02)
+  assert.equal(rescue.x, LEG_LENGTH)
+  assert.equal(rescue.rescued, 1)
+  assert.equal(fly(rescue, false, .02).x, rescue.x)
+  const ring = fly({ ...before, x: gate.x + 13, y: gate.floor - 20 }, false, .03)
+  assert.ok(ring.boost > 0)
+})
+
+test('a pilot following the gaps can fly to the lake without a rescue', async () => {
+  const { fly, FLIGHT_LENGTH, LEG_LENGTH, PASSAGES, startFlight } = await import('../src/lib/endFlight.ts')
+  let flight = startFlight()
+  for (let i = 0; i < 3600 && flight.x < FLIGHT_LENGTH; i++) {
+    const gate = PASSAGES.find(g => g.x + 42 > flight.x)
+    const target = gate ? (gate.top + gate.floor) / 2 : 90
+    flight = fly(flight, flight.y < target, 1 / 60)
+  }
+  assert.equal(flight.x, FLIGHT_LENGTH)
+  assert.equal(flight.checkpoint, 2 * LEG_LENGTH)
+  assert.equal(flight.rescued, 0)
+})
+
+test('Infinity keeps generating passable high and low gates beyond the journey', async () => {
+  const { startFlight, fly, passagesFor, flightScore, FLIGHT_LENGTH } = await import('../src/lib/endFlight.ts')
+  for (const seed of [1, 12, 951]) {
+    let flight = startFlight('infinity', seed)
+    for (let i = 0; i < 24000 && !flight.crashed && flight.gates < 75; i++) {
+      const nearby = passagesFor(flight)
+      assert.ok(nearby.length <= 3)
+      const gate = nearby.find(g => g.x + 40 > flight.x)
+      assert.ok(gate && gate.top > 0 && gate.floor < 200)
+      const target = (gate.top + gate.floor) / 2
+      flight = fly(flight, flight.y + flight.vy * .19 < target, 1 / 60)
+    }
+    assert.equal(flight.crashed, false)
+    assert.equal(flight.gates, 75)
+    assert.ok(flight.x > FLIGHT_LENGTH)
+    assert.ok(flightScore(flight) > 30000)
+  }
+})
+
+test('Infinity scores each ring and gate once and freezes the score on collision', async () => {
+  const { startFlight, fly, passagesFor, flightScore, saveFlightBest, loadFlightBest } = await import('../src/lib/endFlight.ts')
+  const start = startFlight('infinity', 32)
+  const [gate] = passagesFor(start)
+  const ring = fly({ ...start, x: gate.x + 13, y: gate.floor - 20 }, false, .04)
+  assert.equal(ring.rings, 1)
+  assert.equal(ring.gates, 0)
+  assert.equal(fly(ring, false, .04).rings, 1)
+  const clear = fly({ ...ring, x: gate.x + 39 }, false, .04)
+  assert.equal(clear.gates, 1)
+  assert.equal(flightScore(clear), Math.floor(clear.x) + 550)
+  assert.equal(fly(clear, true, .04).gates, 1)
+  for (const y of [gate.floor, gate.top]) {
+    const crash = fly({ ...start, x: gate.x, y }, false, .02)
+    assert.equal(crash.crashed, true)
+    assert.equal(fly(crash, true, .05), crash)
+  }
+  const record = saveFlightBest(flightScore(clear))
+  saveFlightBest(1)
+  assert.equal(loadFlightBest(), record)
+})

@@ -14,12 +14,13 @@ type Props = {
   onOpenFishing: () => void
   onOpenNether: () => void
   rod: RodDef
+  onOpenEnd: () => void
   onOpenDeep: () => void
   onOpenCave: () => void
   pickaxeTier: PickaxeTier
 }
 
-export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFishing, onOpenNether, rod, onOpenDeep, onOpenCave, pickaxeTier }: Props) {
+export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFishing, onOpenNether, rod, onOpenEnd, onOpenDeep, onOpenCave, pickaxeTier }: Props) {
   const { lang, setLang, t } = useLang()
 
   return (
@@ -52,6 +53,11 @@ export function LanguageToggle({ onOpenBook, found, total, activeBiome, onOpenFi
       {activeBiome === 3 && (
         <button type="button" className="world-tools__game world-tools__game--nether" onClick={onOpenNether} aria-label={t('brew_tab')}>
           <PixelIcon name="blaze" />
+        </button>
+      )}
+      {activeBiome === 4 && (
+        <button type="button" className="world-tools__game" onClick={onOpenEnd} title={t('flight_title')} aria-label={t('flight_title')} aria-keyshortcuts="L">
+          <PixelIcon name="scale" />
         </button>
       )}
       <div className="lang" role="group" aria-label={t('lang_label')}>

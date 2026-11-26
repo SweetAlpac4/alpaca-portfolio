@@ -6,6 +6,7 @@ export type AchievementId =
   | 'cave_diamond'
   | 'deepdark_sensor'
   | 'nether_blaze'
+  | 'end_dragon_scale'
   | 'end_pearl'
   | 'credits_star'
   | 'curious_explorer'
@@ -32,6 +33,7 @@ export type AchievementId =
   | 'cave_geologist'
 
 export type PixelIconName =
+  | 'scale'
   | 'book'
   | 'chest'
   | 'diamond'
@@ -114,6 +116,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
       en: 'The heat leaves a glowing trace.',
       id: 'Panasnya meninggalkan jejak bercahaya.',
     },
+  },
+  {
+    id: 'end_dragon_scale', icon: 'scale',
+    title: { en: 'Dragon Scale', id: 'Sisik Naga' },
+    description: { en: 'A keepsake from the dragon that carried you home.', id: 'Kenangan dari naga yang mengantarmu pulang.' },
+    hint: { en: 'Fly from The End to the Overworld lake.', id: 'Terbang dari The End ke danau Overworld.' },
   },
   {
     id: 'end_pearl',

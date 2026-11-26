@@ -15,6 +15,7 @@ import { FishingGame } from './components/FishingGame'
 import { useFishing } from './components/FishingProvider'
 import { useCave } from './components/CaveProvider'
 import { NetherGame } from './components/NetherGame'
+import { EndFlightGame } from './components/EndFlightGame'
 import { DeepDarkGame } from './components/DeepDarkGame'
 import { CaveGame } from './components/CaveGame'
 import { GameMilestones } from './components/GameMilestones'
@@ -47,6 +48,7 @@ export function Portfolio() {
   const [bookOpen, setBookOpen] = useState(false)
   const [fishingOpen, setFishingOpen] = useState(false)
   const [netherOpen, setNetherOpen] = useState(false)
+  const [endOpen, setEndOpen] = useState(false)
   const [deepOpen, setDeepOpen] = useState(false)
   const [caveOpen, setCaveOpen] = useState(false)
   const [viewport, setViewport] = useState({ w: 0, h: 0 })
@@ -139,6 +141,10 @@ export function Portfolio() {
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return
       if (target?.isContentEditable) return
       if (!entered || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return
+      if (endOpen) {
+        if (event.code === 'KeyL') { event.preventDefault(); setEndOpen(false) }
+        return
+      }
       if (deepOpen) return
       if (caveOpen) {
         if (event.code === 'KeyC') { event.preventDefault(); setCaveOpen(false) }
@@ -171,6 +177,7 @@ export function Portfolio() {
         return
       }
 
+      if (event.code === 'KeyL' && active === 4) { event.preventDefault(); setEndOpen(true); return }
       if (event.code === 'KeyD' && active === 2) { event.preventDefault(); setDeepOpen(true); return }
       if (event.code === 'KeyN' && active === 3) { event.preventDefault(); openNether(); return }
       if (event.code === 'KeyC' && active === 1) { event.preventDefault(); openCave(); return }
@@ -203,7 +210,7 @@ export function Portfolio() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [active, bookOpen, deepOpen, caveOpen, fishingOpen, netherOpen, entered, openCave, openNether, openFishing, goTo])
+  }, [active, bookOpen, endOpen, deepOpen, caveOpen, fishingOpen, netherOpen, entered, openCave, openNether, openFishing, goTo])
 
   useEffect(() => {
     const update = () => setViewport({ w: window.innerWidth, h: window.innerHeight })
@@ -268,6 +275,7 @@ export function Portfolio() {
         activeBiome={entered ? active : -1}
         onOpenFishing={openFishing}
         onOpenNether={openNether}
+        onOpenEnd={() => setEndOpen(true)}
         onOpenDeep={() => setDeepOpen(true)}
         onOpenCave={openCave}
         pickaxeTier={caveState.pickaxe}
@@ -288,6 +296,7 @@ export function Portfolio() {
       <AchievementBook open={bookOpen} onClose={closeBook} />
       {fishingOpen && <FishingGame onClose={closeFishing} onGoToNether={goToNether} />}
       {netherOpen && <NetherGame onClose={closeNether} onGoToFishing={goToOverworld} />}
+      {endOpen && <EndFlightGame onClose={() => setEndOpen(false)} onHome={() => { setEndOpen(false); goToOverworld() }} />}
       {deepOpen && <DeepDarkGame onClose={() => setDeepOpen(false)} />}
       {caveOpen && <CaveGame onClose={closeCave} />}
 
@@ -305,7 +314,8 @@ F3: debug screen on
 E: advancement book
 F: fishing
 N: Nether Brewmaster
-C: Cave Miner`}
+C: Cave Miner
+L: The Last Flight`}
         </pre>
       )}
     </>
