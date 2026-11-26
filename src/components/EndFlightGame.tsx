@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useTouchControls } from '../hooks/useTouchControls'
+import { useEffect, useRef, useState, type ButtonHTMLAttributes } from 'react'
 import { useLang } from '../i18n'
 import { fly, flightScore, FLIGHT_LENGTH, LEG_LENGTH, loadFlightBest, saveFlightBest, startFlight, type FlightMode } from '../lib/endFlight'
 import { ROD_BY_ID } from '../lib/fishing'
@@ -11,6 +12,8 @@ import '../styles/endFlight.css'
 
 export function EndFlightGame({ onClose, onHome }: { onClose: () => void, onHome: () => void }) {
   const { t, lang } = useLang()
+  const touch = useTouchControls()
+  const guide = t(touch ? 'flight_touch_guide' : 'flight_guide')
   const { state, selectedRod } = useFishing()
   const { unlock } = useAchievements()
   const panel = useRef<HTMLDialogElement>(null)
@@ -83,6 +86,26 @@ export function EndFlightGame({ onClose, onHome }: { onClose: () => void, onHome
     setPhase('flying')
   }
 
+  const release = () => { holding.current = false }
+  const flightControls: ButtonHTMLAttributes<HTMLButtonElement> = {
+    onPointerDown: event => {
+      if (!event.isPrimary || event.button !== 0) return
+      event.preventDefault()
+      event.currentTarget.setPointerCapture(event.pointerId)
+      holding.current = true
+    },
+    onLostPointerCapture: release,
+    onPointerCancel: release,
+    onPointerUp: event => { if (event.isPrimary) release() },
+    onBlur: release,
+    onKeyDown: event => {
+      if (event.code === 'Space') { event.preventDefault(); holding.current = true }
+    },
+    onKeyUp: event => {
+      if (event.code === 'Space') { event.preventDefault(); release() }
+    },
+  }
+
   const checkpoint = flight.checkpoint / LEG_LENGTH
   // The first approach lasts about three seconds. A rescue can rewind x to zero.
   const showGuide = flight.x < 180 && flight.rescued === 0
@@ -92,18 +115,7 @@ export function EndFlightGame({ onClose, onHome }: { onClose: () => void, onHome
       <div><small>{landed ? 'Overworld' : 'The End'}</small><h2 id="flight-title">{t(landed ? 'flight_landed' : endless && phase !== 'ready' ? 'flight_infinity' : 'flight_title')}</h2></div>
       <button type="button" className="end-flight__close" aria-label={t('close')} onClick={onClose}>×</button>
     </header>
-    {phase === 'flying' ? <button ref={sky} type="button" className="end-flight__sky" aria-label={t('flight_guide')}
-      onPointerDown={e => {
-        if (!e.isPrimary || e.button !== 0) return
-        e.currentTarget.setPointerCapture(e.pointerId)
-        holding.current = true
-      }}
-      onLostPointerCapture={() => { holding.current = false }}
-      onPointerUp={() => { holding.current = false }}
-      onPointerCancel={() => { holding.current = false }}
-      onBlur={() => { holding.current = false }}
-      onKeyDown={e => { if (e.code === 'Space') { e.preventDefault(); holding.current = true } }}
-      onKeyUp={e => { if (e.code === 'Space') { e.preventDefault(); holding.current = false } }}>
+    {phase === 'flying' ? <button ref={sky} type="button" className="end-flight__sky" aria-label={guide} {...flightControls}>
       <EndFlightScene flight={flight} />
     </button> : <div className="end-flight__sky">
       {landed ? <>
@@ -130,7 +142,7 @@ export function EndFlightGame({ onClose, onHome }: { onClose: () => void, onHome
         <span>{Math.floor(flight.x / FLIGHT_LENGTH * 100)}%</span>
       </div>}
       {phase === 'flying' ? <div className="end-flight__messages">
-        <p style={{ visibility: showGuide ? 'visible' : 'hidden' }}>{t('flight_guide')}</p>
+        <p style={{ visibility: showGuide ? 'visible' : 'hidden' }}>{guide}</p>
         <p role="status">{notice}</p>
       </div> : phase === 'crashed' ? <>
         <p role="status">{t('flight_crash')} · {t('flight_gates')} {flight.gates} · {t('flight_rings')} {flight.rings}</p>
@@ -139,8 +151,9 @@ export function EndFlightGame({ onClose, onHome }: { onClose: () => void, onHome
           <button type="button" onClick={() => setPhase('ready')}>{t('flight_mode')}</button>
         </div>
       </> : <p aria-live="polite">{t(landed ? 'flight_keepsake' : endless ? 'flight_infinity_rules' : 'flight_intro')}</p>}
-      {phase === 'ready' && <><p>{t('flight_guide')}</p><button type="button" className="end-flight__action" onClick={start}>{t(endless ? 'flight_infinity_start' : 'flight_light')}</button></>}
+      {phase === 'ready' && <><p>{guide}</p><button type="button" className="end-flight__action" onClick={start}>{t(endless ? 'flight_infinity_start' : 'flight_light')}</button></>}
       {landed && <div className="end-flight__actions"><button type="button" className="end-flight__action" autoFocus onClick={onHome}><PixelIcon name="scale" />{t('flight_home')}</button><button type="button" onClick={start}>{t('flight_replay')}</button></div>}
+      {touch && phase === 'flying' && <button type="button" className="end-flight__dive" {...flightControls}>{t('flight_dive')}</button>}
     </footer>
   </dialog>
 }

@@ -298,15 +298,12 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
   }, [clearTimers, phase, selectedRod, state.discovered, state.wardenCasts])
 
   const onPrimaryDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (!event.isPrimary || event.button !== 0) return
     event.preventDefault()
-    if (phase === 'bite') {
-      startReel()
-      holdingRef.current = true
-      setHolding(true)
-    } else if (phase === 'reeling') {
-      holdingRef.current = true
-      setHolding(true)
-    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    if (phase === 'bite') startReel()
+    holdingRef.current = true
+    setHolding(true)
   }
 
   const releaseHold = () => {
@@ -604,12 +601,7 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
                 {phase === 'idle' && (
                   <>
                     <p className="fishing-hint">{t('fishing_help')}</p>
-                    <button
-                      type="button"
-                      className="mc-btn fishing-action"
-                      onClick={beginCast}
-                      disabled={chestFull}
-                    >
+                    <button type="button" className="mc-btn fishing-action" onClick={beginCast} disabled={chestFull}>
                       {t('cast')}
                     </button>
                   </>
@@ -624,24 +616,7 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
                 )}
 
                 {phase === 'bite' && (
-                  <>
-                    <p className="fishing-status fishing-status--bite">
-                      {t('bite')}
-                    </p>
-                    <button
-                      type="button"
-                      className="mc-btn fishing-action fishing-action--bite"
-                      onPointerDown={onPrimaryDown}
-                      onPointerUp={releaseHold}
-                      onPointerCancel={releaseHold}
-                      onPointerLeave={releaseHold}
-                      onClick={() => {
-                        if (phase === 'bite') startReel()
-                      }}
-                    >
-                      {t('reel')}
-                    </button>
-                  </>
+                  <p className="fishing-status fishing-status--bite">{t('bite')}</p>
                 )}
 
                 {phase === 'reeling' && (
@@ -676,19 +651,21 @@ export function FishingGame({ onClose, onGoToNether }: Props) {
                       </div>
                     </div>
                     <p className="fishing-hint">{t('release_to_slack')}</p>
-                    <button
-                      type="button"
-                      className={`mc-btn fishing-action fishing-action--hold${
-                        holding ? ' is-holding' : ''
-                      }`}
-                      onPointerDown={onPrimaryDown}
-                      onPointerUp={releaseHold}
-                      onPointerCancel={releaseHold}
-                      onPointerLeave={releaseHold}
-                    >
-                      {t('hold_to_reel')}
-                    </button>
                   </>
+                )}
+
+                {(phase === 'bite' || phase === 'reeling') && (
+                  <button
+                    type="button"
+                    className={`mc-btn fishing-action ${phase === 'bite' ? 'fishing-action--bite' : 'fishing-action--hold'}${holding ? ' is-holding' : ''}`}
+                    onPointerDown={onPrimaryDown}
+                    onPointerUp={event => { if (event.isPrimary) releaseHold() }}
+                    onLostPointerCapture={releaseHold}
+                    onPointerCancel={releaseHold}
+                    onClick={() => { if (phase === 'bite') startReel() }}
+                  >
+                    {t(phase === 'bite' ? 'reel' : 'hold_to_reel')}
+                  </button>
                 )}
 
                 {phase === 'result' && result && (

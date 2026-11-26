@@ -50,3 +50,16 @@
 
 .deep-rod { display: flex; align-items: center; gap: 10px; }
 .deep-rod svg { width: 42px; height: 42px; }
+
+@media (pointer: coarse) {
+  .deep-game { overscroll-behavior: contain; }
+  .deep-game header button, .deep-game section > button { min-height: 44px; min-width: 44px; }
+  .deep-map { width: min(100%, 335px); touch-action: none; user-select: none; }
+  .deep-map button:disabled { pointer-events: none; }
+  .deep-runes { width: min(100%, 200px); touch-action: manipulation; }
+}
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 540px) {
+  .deep-game:has(.deep-map) { width: min(95vw, 720px); }
+  .deep-game section:has(.deep-map) { grid-template-columns: 1fr 1fr; align-content: start; }
+  .deep-map { grid-column: 2; grid-row: 1 / span 3; width: min(100%, 66dvh); }
+}

@@ -78,3 +78,16 @@
 .end-flight__score { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .end-flight__score strong { color: #ffe2a3; font-size: 1.3em; }
 .end-flight__score b { color: #d1b0e1; }
+
+.end-flight .end-flight__dive {
+  min-height: 46px;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  background: #493552;
+  border-color: #ab8cb6;
+}
+.end-flight__dive:active { background: #60466c; }
+@media (pointer: coarse) {
+  .end-flight__modes button, .end-flight__actions button, .end-flight__action { min-height: 44px; }
+}

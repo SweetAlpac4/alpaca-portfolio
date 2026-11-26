@@ -162,14 +162,16 @@ export function CaveGame({ onClose }: Props) {
           <div className="cave-meter-row"><span>{t('cave_time')}</span><strong>{Math.ceil((45000 - elapsed) / 1000)}s</strong><meter min={0} max={45000} value={45000 - elapsed} aria-label={t('cave_time')}/></div>
           <div className="cave-meter-row"><span>{t('cave_durability')}</span><strong>{run.durability}/{maxDurability}</strong><meter min={0} max={maxDurability} value={run.durability} aria-label={t('cave_durability')}/></div>
           <div className="cave-action">{running ? <><strong>{t('cave_mining')}</strong><button className="cave-button cave-button--done" onClick={() => finish(true)} disabled={run.blocks === 0}>{t('cave_done_mining')}</button></> : <button className="cave-button" onClick={startRun}>{result || state.runs ? t('cave_dig_again') : t('cave_start')}</button>}</div>
-          <div className="cave-mine-grid" role="grid" aria-label="7 × 7 cave mining grid">
-            {grid.map(block => {
-              const locked = block.row > maxRow
-              const reachable = isReachable(block, grid, maxRow)
-              return <button key={block.id} role="gridcell" className={`cave-cell cave-cell--${block.content}${block.mined ? ' is-mined' : ''}${locked ? ' is-locked' : ''}${reachable && !result ? ' is-reachable' : ''}${!reachable && !locked && !block.mined ? ' is-distant' : ''}${block.content === 'diamond' && !block.mined ? ' is-glint' : ''}`} onClick={() => mine(block)} disabled={!running || block.mined} aria-label={cellLabel(block)} title={locked ? t('cave_locked_hint') : !reachable ? t('cave_route_hint') : t(`cave_ore_${block.content}` as never)}>
-                {locked ? <span className="cave-cell__lock"><PickaxeIcon tier={state.pickaxe}/><small>{block.row}</small></span> : block.mined ? <span className="cave-pit"/> : <><span className="cave-cell__ore">{ORES.includes(block.content as OreId) ? <OreIcon ore={block.content as OreId}/> : block.content === 'nether_quartz' || block.content === 'glowstone_dust' ? <MaterialIcon material={block.content}/> : <span className={`cave-cell__terrain cave-cell__terrain--${block.content}`}/>}</span><small>{BLOCK_MARK[block.content]}</small></>}
-              </button>
-            })}
+          <div className="cave-board-space">
+            <div className="cave-mine-grid" role="grid" aria-label="7 × 7 cave mining grid">
+              {grid.map(block => {
+                const locked = block.row > maxRow
+                const reachable = isReachable(block, grid, maxRow)
+                return <button key={block.id} role="gridcell" className={`cave-cell cave-cell--${block.content}${block.mined ? ' is-mined' : ''}${locked ? ' is-locked' : ''}${reachable && !result ? ' is-reachable' : ''}${!reachable && !locked && !block.mined ? ' is-distant' : ''}${block.content === 'diamond' && !block.mined ? ' is-glint' : ''}`} onClick={() => mine(block)} disabled={!running || block.mined} aria-label={cellLabel(block)} title={locked ? t('cave_locked_hint') : !reachable ? t('cave_route_hint') : t(`cave_ore_${block.content}` as never)}>
+                  {locked ? <span className="cave-cell__lock"><PickaxeIcon tier={state.pickaxe}/><small>{block.row}</small></span> : block.mined ? <span className="cave-pit"/> : <><span className="cave-cell__ore">{ORES.includes(block.content as OreId) ? <OreIcon ore={block.content as OreId}/> : block.content === 'nether_quartz' || block.content === 'glowstone_dust' ? <MaterialIcon material={block.content}/> : <span className={`cave-cell__terrain cave-cell__terrain--${block.content}`}/>}</span><small>{BLOCK_MARK[block.content]}</small></>}
+                </button>
+              })}
+            </div>
           </div>
           <div className="cave-legend" aria-label={t('cave_legend')}>
             {ORES.map(ore => <span key={ore}><OreIcon ore={ore}/>{t(`cave_ore_${ore}` as never)}</span>)}

@@ -111,9 +111,8 @@ public/
   `portfolio-achievements-v1` — tanpa akun, tanpa database, dan hanya berlaku
   di browser/perangkat itu. Reset tersedia di dalam buku. Milestone game dicek
   kembali dari progres game saat reload atau progres berubah.
-- Keenam artifact membuka **Curious Explorer**. **Secret ending dinonaktifkan**
-  lewat `src/lib/features.ts` sampai semua biome punya minigame. Progres artefak
-  lama tetap disimpan.
+- Keenam artifact membuka **Curious Explorer**. Pemain yang melengkapi seluruh
+  buku pencapaian bisa menemukan pesan pribadi setelah kredit.
 - Ada 13 milestone game: tangkapan pertama/25 tangkapan, semua 6 pancing,
   12 tangkapan reguler, Echo Fish, bahan Rift pertama/6 jenis bahan, racikan
   berhasil pertama, Perfect pertama/5 Perfect, semua resep terbuka/berhasil

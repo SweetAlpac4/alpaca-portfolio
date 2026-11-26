@@ -666,3 +666,15 @@
     transition: none !important;
   }
 }
+
+@media (pointer: coarse) {
+  .nether-actions kbd { display: none; }
+  .nether-actions button, .nether-close, .nether-tabs button { min-height: 44px; min-width: 44px; touch-action: manipulation; }
+}
+@media (pointer: coarse) and (max-width: 760px) {
+  .nether-game--running .nether-tabs, .nether-game--running .nether-game__stats,
+  .nether-game--running .nether-game__head > div > p:last-child { display: none; }
+  .nether-game--running .nether-world { height: clamp(80px, 16dvh, 148px); }
+  .nether-game--running .nether-scene { height: 100%; object-fit: cover; }
+  .nether-game--running .nether-console { gap: 6px; }
+}

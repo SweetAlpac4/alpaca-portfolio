@@ -1,3 +1,4 @@
+import { useTouchControls } from '../hooks/useTouchControls'
 import { useEffect, useRef, useState } from 'react'
 import { useLang } from '../i18n'
 
@@ -17,6 +18,7 @@ const TIP_KEYS = [
 
 export function LoadingScreen({ ready, onPlay, onEnter }: Props) {
   const { t } = useLang()
+  const touch = useTouchControls()
   const [progress, setProgress] = useState(0)
   const [tipIndex, setTipIndex] = useState(0)
   const [leaving, setLeaving] = useState(false)
@@ -100,11 +102,11 @@ export function LoadingScreen({ ready, onPlay, onEnter }: Props) {
         </div>
         <p className="loading__pct">{progress}%</p>
 
-        <p className="loading__tip">{t(TIP_KEYS[tipIndex])}</p>
+        <p className="loading__tip">{t(touch && tipIndex === 0 ? 'touch_tip_game' : touch && tipIndex === 4 ? 'touch_tip_book' : TIP_KEYS[tipIndex])}</p>
 
         {done && (
           <button className="mc-btn loading__play" onClick={enter} autoFocus>
-            {t('click_to_play')}
+            {t(touch ? 'tap_to_play' : 'click_to_play')}
           </button>
         )}
       </div>

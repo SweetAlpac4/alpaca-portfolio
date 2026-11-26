@@ -1302,3 +1302,16 @@
   }
   .fishing-bite { transform: translateX(-50%); }
 }
+
+.fishing-action--bite, .fishing-action--hold {
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+@media (pointer: coarse) and (max-width: 760px) {
+  .fishing__close { min-width: 44px; min-height: 44px; }
+  .fishing-pond { aspect-ratio: auto; height: clamp(100px, 27dvh, 230px); }
+  .fishing-controls { grid-template-rows: 1fr auto auto; }
+  .fishing__tab { padding-inline: 3px; }
+}

@@ -807,6 +807,32 @@
   will-change: transform;
 }
 
+.credits__track--last {
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.credits__afterword {
+  position: absolute;
+  inset: 76px 6vw 100px;
+  z-index: 3;
+  display: flex;
+  overflow-y: auto;
+}
+.credits__afterword:empty { display: none; }
+.credits__letter {
+  margin: auto;
+  max-width: 54ch;
+  font-size: clamp(.78rem, 2vw, .98rem);
+  line-height: 1.75;
+  color: #ddd7f0;
+  animation: letter-arrives 1.2s ease-out both;
+}
+.credits__letter h2 { font-size: 1.25em; color: #fff1ce; }
+.credits__letter p { margin-top: 1em; }
+.credits__signature { color: #c3acd9; }
+@keyframes letter-arrives { from { opacity: 0; } to { opacity: 1; } }
+
 .biome--credits.is-active .credits__track {
   animation-play-state: running;
 }
@@ -994,4 +1020,26 @@
     width: 23px;
     height: 23px;
   }
+}
+
+@media (pointer: coarse) {
+  .world-tools { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); }
+  .world-tools__book, .world-tools__game, .lang__btn { min-width: 44px; min-height: 44px; }
+  .hotbar { bottom: max(6px, env(safe-area-inset-bottom)); }
+  .hotbar .hotbar__slot { width: clamp(40px, 12vw, 46px); height: 44px; }
+  .xp { bottom: calc(max(6px, env(safe-area-inset-bottom)) + 56px); }
+  .xp__level { bottom: calc(max(6px, env(safe-area-inset-bottom)) + 68px); }
+  .credits__actions { z-index: 4; }
+  .credits__afterword { inset: max(74px, calc(env(safe-area-inset-top) + 60px)) 6vw max(96px, calc(env(safe-area-inset-bottom) + 78px)); }
+  .credits__letter { overflow-wrap: break-word; }
+}
+@media (pointer: coarse) and (max-width: 760px) {
+  .biome__inner {
+    padding-top: calc(max(8px, env(safe-area-inset-top)) + 60px);
+    padding-bottom: 18px;
+    max-height: calc(100dvh - max(88px, calc(env(safe-area-inset-bottom) + 82px)));
+    overscroll-behavior-y: auto;
+  }
+  .music { bottom: calc(max(6px, env(safe-area-inset-bottom)) + 58px); right: max(8px, env(safe-area-inset-right)); }
+  .credits__actions { top: max(8px, env(safe-area-inset-top)); left: max(8px, env(safe-area-inset-left)); }
 }

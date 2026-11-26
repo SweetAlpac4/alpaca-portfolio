@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTouchControls } from '../hooks/useTouchControls'
 import { useLang } from '../i18n'
 import { ARTIFACTS } from '../lib/achievements'
 import { adjacent, BEAT_LIMIT, BEAT_MS, ENTRANCE, EXIT, furnacePuzzle, sensor, tiles, toggleRune, WIDTH } from '../lib/deepDark'
@@ -15,12 +16,15 @@ const startJourney = (): Journey => ({ started: false, pos: ENTRANCE, beat: 0, s
 
 export function DeepDarkGame({ onClose }: { onClose: () => void }) {
   const { lang } = useLang()
+  const touch = useTouchControls()
   const say = (en: string, id: string) => lang === 'id' ? id : en
   const { state: fishing, claimShard, forgeRod } = useFishing()
   const { state: cave, spendVoidsteel } = useCave()
   const { state: nether, spendResonance } = useNether()
   const { unlocked } = useAchievements()
   const dialog = useRef<HTMLDialogElement>(null)
+  const swipe = useRef<{ x: number; y: number } | null>(null)
+  const swiped = useRef(false)
   const board = useRef<HTMLDivElement>(null)
   const [stage, setStage] = useState<'camp' | 'walk' | 'forge'>('camp')
   const [journey, setJourney] = useState(startJourney)
@@ -106,9 +110,34 @@ export function DeepDarkGame({ onClose }: { onClose: () => void }) {
         {!fishing.shardFound && <button onClick={() => { setJourney(startJourney()); setStage('walk') }}>Silent Steps ▸</button>}
         <button disabled={!ready} onClick={ignite}>{say('Light furnace with Soul Flame', 'Nyalakan tungku dengan Api Jiwa')}</button></section>)}
     {stage === 'walk' && <section>
-      <p>{say('Take ◆ and return to the entrance ⚑. Tap a neighboring tile or use arrows. Amber warns of the next red pulse. Wool ▦ shelters you. Two hits wake the Warden.', 'Ambil ◆ lalu kembali ke pintu masuk ⚑. Ketuk petak sebelah atau gunakan tombol panah. Kuning menandai gelombang merah berikutnya. Wol ▦ melindungimu. Dua kali terkena, Warden bangun.')}</p>
+      <p>{say('Take ◆ and bring it back to ⚑.', 'Ambil ◆ lalu bawa kembali ke ⚑.')} {touch
+        ? say('Swipe the board or tap the next tile to move one step.', 'Usap papan atau ketuk petak sebelah untuk melangkah.')
+        : say('Use the arrow keys or click an adjacent tile.', 'Gunakan tombol panah atau klik petak sebelah.')} {say('Amber warns of a red pulse. Wool ▦ shelters you. Two hits wake the Warden.', 'Kuning menandai gelombang merah berikutnya. Wol ▦ melindungimu. Dua kali terkena, Warden bangun.')}</p>
       <div className="deep-meter">{!journey.started && say('First step starts the clock · ', 'Timer mulai saat kamu melangkah · ')}{journey.carrying && '◆ → ⚑ · '}{say('Alarm', 'Alarm')} {journey.strikes}/2 · {Math.max(0, Math.ceil((BEAT_LIMIT - journey.beat) * BEAT_MS / 1000))}s</div>
-      <div className="deep-map" ref={board} tabIndex={-1} role="group" aria-label="Silent Steps">{Array.from(tiles, (tile, i) => {
+      <div className="deep-map" ref={board} tabIndex={-1} role="group" aria-label="Silent Steps"
+        onTouchStart={event => {
+          const finger = event.touches[0]
+          swipe.current = event.touches.length === 1 ? { x: finger.clientX, y: finger.clientY } : null
+          swiped.current = false
+        }}
+        onTouchCancel={() => { swipe.current = null }}
+        onTouchEnd={event => {
+          const from = swipe.current
+          swipe.current = null
+          if (!from || event.touches.length) return
+          const dx = event.changedTouches[0].clientX - from.x
+          const dy = event.changedTouches[0].clientY - from.y
+          if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return
+          swiped.current = true
+          const offset = Math.abs(dx) > Math.abs(dy) ? Math.sign(dx) : Math.sign(dy) * WIDTH
+          step(journey.pos + offset)
+        }}
+        onClickCapture={event => {
+          if (swiped.current && event.detail > 0) {
+            event.stopPropagation()
+            swiped.current = false
+          }
+        }}>{Array.from(tiles, (tile, i) => {
         const phase = sensor(i, journey.beat)
         const symbol = i === journey.pos ? '●' : tile === 'E' && !journey.carrying ? '◆' : tile === 'S' ? '⚑' : tile === 'w' ? '▦' : phase === 'warning' ? '!' : phase === 'pulse' ? '×' : ''
         return <button key={i} className={'deep-tile ' + phase} data-player={i === journey.pos} data-shard={tile === 'E' && !journey.carrying} data-wall={tile === '#'} disabled={caught || !adjacent(i, journey.pos) || tile === '#'} onClick={() => step(i)}

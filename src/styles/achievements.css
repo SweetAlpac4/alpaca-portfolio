@@ -421,21 +421,6 @@
   top: 124px;
 }
 
-.credits__block--secret {
-  padding: 10px 14px;
-  background: rgba(255, 215, 94, 0.05);
-  border: 2px solid rgba(255, 215, 94, 0.28);
-}
-
-.credits__block--secret .credits__label {
-  color: var(--gold);
-}
-
-.credits__block--secret .credits__value {
-  color: #ffe9a8;
-  text-shadow: 1px 1px 0 #000, 0 0 16px rgba(255, 215, 94, 0.25);
-}
-
 @keyframes book-overlay-in {
   from {
     opacity: 0;

@@ -6,7 +6,8 @@ import { brewCost, brewReward, createInitialNetherState, loadNetherState, NETHER
 import { advanceBrew, BREW_DURATION, createBrewSession, currentBeat, finishBrew, markerPosition, tapIngredient, ventBrew } from '../src/lib/brewSession.ts'
 import { gameMilestones } from '../src/lib/gameMilestones.ts'
 import { MATERIALS } from '../src/lib/materials.ts'
-import { SECRET_ENDING_ENABLED } from '../src/lib/features.ts'
+import { canReadAfterword } from '../src/lib/features.ts'
+import { ACHIEVEMENTS } from '../src/lib/achievements.ts'
 import { addOreToState, BLOCK_WEIGHTS, canUpgrade, createInitialCaveState, CAVE_STORAGE_KEY, generateGrid, isReachable, loadCaveState, PICKAXES, resolveMine, upgradePickaxe } from '../src/lib/cave.ts'
 
 const storage = new Map()
@@ -129,7 +130,6 @@ test('progression unlocks four recipes, cosmetics, rewards, and lifetime achieve
   const milestones = gameMilestones(fishing, nether, createInitialCaveState())
   for (const id of ['fishing_rods', 'fishing_collection', 'rift_collector', 'brew_master', 'brew_clean']) assert.ok(milestones.includes(id))
   assert.ok(!milestones.includes('fishing_echo'))
-  assert.equal(SECRET_ENDING_ENABLED, false)
 })
 
 test('Cave state starts empty, uses wood pickaxe, and serializes cleanly', () => {
@@ -366,4 +366,15 @@ test('Infinity scores each ring and gate once and freezes the score on collision
   const record = saveFlightBest(flightScore(clear))
   saveFlightBest(1)
   assert.equal(loadFlightBest(), record)
+})
+
+
+test('the afterword requires every entry in the advancement book, including secrets', () => {
+  const all = new Set(ACHIEVEMENTS.map(item => item.id))
+  assert.ok(canReadAfterword(all))
+  for (const id of all) {
+    const incomplete = new Set(all)
+    incomplete.delete(id)
+    assert.equal(canReadAfterword(incomplete), false)
+  }
 })
