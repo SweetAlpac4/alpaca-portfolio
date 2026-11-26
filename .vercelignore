@@ -3,3 +3,13 @@ reference/
 dist/
 .env.local
 .vercel/
+
+.aws/
+.codex/
+.agents/
+supabase/.temp/
+*.pem
+*.key
+
+.env
+.env.*

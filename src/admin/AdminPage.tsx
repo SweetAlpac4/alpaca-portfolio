@@ -79,6 +79,13 @@ export function AdminPage() {
 
   if (!session) return <Login />
 
+  if (session.user.app_metadata.portfolio_admin !== true) {
+    return <div className="admin admin--login"><div className="login-card">
+      <h1>Admin access required</h1>
+      <button className="mc-btn" onClick={() => void supabase?.auth.signOut()}>Sign out</button>
+    </div></div>
+  }
+
   return <Dashboard email={session.user.email ?? 'admin'} />
 }
 

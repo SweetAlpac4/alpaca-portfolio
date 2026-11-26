@@ -1,3 +1,4 @@
+import { contentUrl } from '../../lib/contentUrl'
 import { useState } from 'react'
 import { uploadImage } from '../api'
 
@@ -11,6 +12,8 @@ type Props = {
 export function ImageUpload({ label, value, folder, onChange }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+
+  const preview = contentUrl(value)
 
   const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -34,8 +37,8 @@ export function ImageUpload({ label, value, folder, onChange }: Props) {
         {label}
       </p>
       <div className="image-upload">
-        {value ? (
-          <img className="image-upload__preview" src={value} alt="" />
+        {preview ? (
+          <img className="image-upload__preview" src={preview} alt="" />
         ) : (
           <div className="image-upload__empty">No image yet</div>
         )}

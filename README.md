@@ -50,12 +50,21 @@ Tanpa env, situs tetap jalan memakai konten fallback (tidak bisa login admin).
 4. **Authentication → Users → Add user**: buat admin, centang **Auto Confirm User**.
 5. **Storage → New bucket**: nama `media`, **Public**.
 6. **SQL Editor** → paste isi `supabase/migrations/0001_init.sql` → **Run**.
-7. Paste isi `supabase/migrations/0002_achievements.sql` → **Run**.
+7. Jalankan `supabase/migrations/0002_achievements.sql` jika belum diterapkan.
+8. Dari SQL Editor, tetapkan admin berdasarkan **User UID** yang sudah kamu verifikasi di Authentication. Ganti placeholder dengan UUID akun milikmu, pastikan satu baris diperbarui, lalu keluar dan masuk lagi agar token diperbarui.
+
+```sql
+update auth.users
+set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"portfolio_admin":true}'::jsonb
+where id = '<ADMIN_USER_UUID>'::uuid
+returning id;
+```
+
+9. Terapkan [migrasi pembatasan akses](supabase/migrations/20261126050913_restrict_portfolio_access.sql) di SQL Editor. Lalu deploy frontend yang sesuai. Untuk proteksi login, cek batas permintaan Supabase Auth dan aktifkan penolakan kata sandi bocor jika tersedia pada paket proyek.
 
 Migration `0001` membuat tabel, RLS policy, storage policy, dan starter content
 (3 project, 8 skill, 3 experience, 4 social). `0002` menambahkan tabel
-`achievements` untuk sertifikat lomba. Kalau kamu sudah pernah menjalankan
-`0001`, cukup jalankan `0002` saja.
+`achievements` untuk sertifikat lomba. Migrasi terakhir membatasi perubahan konten, pembacaan draft, dan upload media ke admin. File di bucket publik dapat diakses lewat URL, termasuk gambar yang dipakai pada draft.
 
 ## Admin
 

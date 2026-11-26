@@ -11,3 +11,10 @@ reference/**/*.png
 reference/**/*.jpg
 reference/**/*.jpeg
 reference/**/*.psd
+
+.aws/
+.codex/
+.agents/
+supabase/.temp/
+*.pem
+*.key

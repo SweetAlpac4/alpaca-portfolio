@@ -1,3 +1,4 @@
+import { contentUrl } from '../lib/contentUrl'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { fallbackContent } from './fallback'
@@ -42,8 +43,8 @@ function toProfile(row: Row): Profile {
     bio: loc(row.bio),
     location: loc(row.location),
     email: str(row.email),
-    avatar_url: (row.avatar_url as string | null) ?? null,
-    resume_url: (row.resume_url as string | null) ?? null,
+    avatar_url: contentUrl(row.avatar_url),
+    resume_url: contentUrl(row.resume_url),
   }
 }
 
@@ -54,9 +55,9 @@ function toProject(row: Row): Project {
     title: loc(row.title),
     description: loc(row.description),
     tech: arr(row.tech),
-    image_url: (row.image_url as string | null) ?? null,
-    demo_url: (row.demo_url as string | null) ?? null,
-    repo_url: (row.repo_url as string | null) ?? null,
+    image_url: contentUrl(row.image_url),
+    demo_url: contentUrl(row.demo_url),
+    repo_url: contentUrl(row.repo_url),
     year: (row.year as string | null) ?? null,
     featured: bool(row.featured),
     published: bool(row.published, true),
@@ -71,8 +72,8 @@ function toAchievement(row: Row): Achievement {
     issuer: str(row.issuer),
     description: loc(row.description),
     year: (row.year as string | null) ?? null,
-    certificate_url: (row.certificate_url as string | null) ?? null,
-    link_url: (row.link_url as string | null) ?? null,
+    certificate_url: contentUrl(row.certificate_url),
+    link_url: contentUrl(row.link_url),
     published: bool(row.published, true),
     sort_order: num(row.sort_order),
   }
@@ -98,7 +99,7 @@ function toExperience(row: Row): Experience {
     role: loc(row.role),
     period: str(row.period),
     description: loc(row.description),
-    logo_url: (row.logo_url as string | null) ?? null,
+    logo_url: contentUrl(row.logo_url),
     sort_order: num(row.sort_order),
   }
 }
@@ -107,7 +108,7 @@ function toSocial(row: Row): Social {
   return {
     id: str(row.id),
     platform: str(row.platform),
-    url: str(row.url),
+    url: contentUrl(row.url, true) ?? '',
     label: str(row.label),
     icon: str(row.icon, 'link'),
     sort_order: num(row.sort_order),
@@ -192,7 +193,7 @@ export async function fetchContent(): Promise<SiteContent> {
       'socials',
       supabase.from('socials').select('*').order('sort_order', { ascending: true }),
     ),
-    fetchSection<Row>('settings', supabase.from('settings').select('*')),
+    fetchSection<Row>('settings', supabase.from('settings').select('key,value').in('key', ['credits', 'seo_title', 'seo_description'])),
   ])
 
   const profile =
@@ -214,7 +215,7 @@ export async function fetchContent(): Promise<SiteContent> {
     ? experienceRows.map(toExperience)
     : fallbackContent.experiences
 
-  const socials = socialRows ? socialRows.map(toSocial) : fallbackContent.socials
+  const socials = socialRows ? socialRows.map(toSocial).filter(social => social.url) : fallbackContent.socials
 
   const settings =
     settingRows && settingRows.length > 0
