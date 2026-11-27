@@ -4,6 +4,8 @@ A personal portfolio website with a Minecraft theme. Biome-based scroll snapping
 "Loading world" style loading screen, bilingual (EN/ID), and an admin panel to edit
 content without code.
 
+[Minigames](#minigames) · [Achievement Book](#achievement-book) · [Run locally](#running-locally) · [Deployment](#deploy)
+
 ## Sections
 
 | # | Biome | Content |
@@ -96,120 +98,166 @@ src/
 ├── components/     # loading, hotbar, music, toast, icons
 ├── sections/       # Overworld, Cave, DeepDark, Nether, TheEnd, Credits
 ├── admin/          # login, dashboard, editors, form components
-├── styles/         # base, layout, sections, achievements, fishing, admin
-└── lib/            # supabase, achievement, fishing, and secret-item storage
+├── styles/         # site, minigame, and admin styles
+└── lib/            # game rules, saves, achievements, and Supabase client
 
 public/
 ├── fonts/          # Monocraft (SIL OFL)
 ├── textures/       # generated 16×16 textures
 ├── img/biomes/     # AVIF + WebP backgrounds (1280/1920/2560)
 └── audio/          # music (tracked in Git)
+
+docs/screenshots/   # gameplay and Achievement Book screenshots
 ```
 
-## Achievement book
+## Minigames
 
-- Open it via the book button at the top or press `E`.
-- There are **6 hidden artifacts** in different biomes. Click a sparkling item to
-  earn an advancement.
-- Progress is stored in the browser's `localStorage` under the key
-  `portfolio-achievements-v1` — no account, no database, and only valid
-  on that browser/device. A reset is available inside the book. Game milestones are checked
-  again from game progress on reload or when progress changes.
-- Collecting all six artifacts unlocks **Curious Explorer**. Players who complete the entire
-  achievement book can find a personal message after the credits.
-- There are 13 game milestones: first catch/25 catches, all 6 rods,
-  12 regular catches, Echo Fish, first Rift material/6 material types, first
-  successful brew, first Perfect/5 Perfects, all recipes unlocked/successfully
-  brewed, and 9 precise pours without overheating.
-- The book has All, Artifacts, and Minigame filters. Milestones already
-  satisfied by an old save are recognized immediately when the page opens.
-- This is separate from the **Achievements** tab in Deep Dark, which holds real
-  achievements/certificates from Supabase.
+Open the game icon next to the Achievement Book while you are in its biome. The bottom hotbar is for biome navigation. On desktop, use the arrow keys or `1`–`6` to move between sections and `Esc` to close a game. On a phone, tap a hotbar slot and then the game icon.
 
-## Fishing mini-game
+| Biome | Minigame | Open | Phone controls |
+| --- | --- | --- | --- |
+| Overworld | [Fishing](#fishing--overworld) | `F` | Tap **Cast**, then hold and release **Reel** |
+| Cave | [Cave Miner — Ore Rush](#cave-miner--ore-rush) | `C` | Tap reachable blocks; switch between Mine and Gear |
+| Deep Dark | [Silent Steps](#silent-steps--deep-dark) | `D` → **Silent Steps** | Swipe the board or tap a neighboring tile |
+| Deep Dark | [Resonance Furnace](#resonance-furnace--deep-dark) | `D` → light the furnace | Tap runes to flip them |
+| Nether | [Nether Brewmaster](#nether-brewmaster) | `N` | Tap **Add** and **Vent heat** |
+| The End | [The Last Flight](#the-last-flight--the-end) | `L` | Hold the sky or **Hold to dive**; release to climb |
 
-- The minigame can only be opened in the Overworld biome, via the fishing icon next to the Achievement Book or by pressing `F` while in the Overworld.
-- Flow: **Cast** → wait for the `!` signal → press **Reel** → hold the button to pull
-  and release before the tension hits the limit. Catch progress must reach 100%.
-- The pixel-art scenery follows the device's local time: **Night**, **Dawn**,
-  **Day**, or **Dusk**, with matching landscape colors and reflections.
-- The rod is drawn in the foreground (bottom right). While reeling, the rod bounces,
-  the line tightens, the bobber moves toward the rod, and the fish silhouette can be seen
-  struggling underwater.
-- There are 5 regular rods: Basic, Sturdy, Lucky, Golden, Prismarine. New rods unlock
-  from catch count/species milestones; unlocked rods can be
-  equipped from the **Rods** tab.
-- There are 12 regular catches + **1 secret fish** (Echo Fish) with mythic rarity.
-  Each fish has a rarity, weight, length, and size class
-  (Tiny/Small/Average/Large/Trophy).
-- The **Chest** tab holds up to **54 fish**; fish can be released (double-click to
-  confirm), and the list can be sorted by newest/heaviest.
-- The **Journal** tab shows every species. Species that have not been caught
-  appear as black silhouettes; caught ones appear in color along with their
-  best weight/length records and catch count.
-- Progress is stored in `localStorage` under the key `portfolio-fishing-v1`, separate
-  from the achievement book (`portfolio-achievements-v1`).
-- The Warden Rod is forged in Deep Dark. The Echo Fish chance on the first five casts with this rod is 20%, 40%, 60%, 80%, and 100%. After the fifth cast, a bite is guaranteed until the Echo Fish is successfully caught.
+Fishing and mining stock the shared Brewing Bag. Brewing can boost fishing or supply a potion for the furnace, where the Echo Shard and Voidsteel help forge the rod that attracts the Echo Fish.
 
-## Deep Dark
+### Fishing — Overworld
 
-Open the sculk icon next to the book or press D in Deep Dark. In Silent Steps, grab the Echo Shard and return to the entrance before time runs out. Two waves that hit the player wake the Warden. Bring the shard, one Voidsteel (5% per Cave row 7 block), one Resonance Potion, and all six artifacts to the furnace. Activate the Soul Flame in the Nether after five Perfect brews. Light all runes in five steps to forge the Warden Rod. Repeating the puzzle keeps the materials.
+![Overworld fishing at the lake with a bite on the line](docs/screenshots/fishing.png)
 
-## Nether Brewmaster
+Cast, wait for the `!` signal, and reel the fish in. Hold to bring it closer and release to lower tension before the line snaps. The lake changes between night, dawn, day, and dusk using the device's local time.
 
-- The minigame can only be opened in the Nether biome, via the brewing icon next to the Achievement Book or by pressing `N` while in the Nether.
-  `Esc` closes the game. The bottom hotbar buttons are only for biome navigation.
-- Loop: **fishing → Rift material catch → brewing → fishing bonus**.
-  The material replaces the fish on that catch, rather than being a bonus alongside the fish.
-- Six materials: Nether Wart, Glowstone Dust, Nether Quartz, Magma Cream,
-  Blaze Powder, Ghast Tear. Base material chance is 14%, increasing with rod luck;
-  Ember Bait adds 22 percentage points. Rod luck also raises the chance of
-  rare materials. Rift catches have a red effect on the water.
-- Materials go into the **Brewing Bag**, separate from the 54 fish slots and 13 fish
-  journal entries. Material discoveries are recorded permanently once a material is used. Resetting fishing
-  clears fish/rods/stats; the bag, bonuses, and starter claim remain.
-- Claim the starter kit once for the first recipe materials. One round uses
-  3 materials and lasts **36 seconds**: 3 pours for each material.
-  Click **Add** / `Space` when the marker is in the golden zone (35–65%).
-  Click **Vent heat** / `V` to lower the temperature by 24%; cooldown 1.6 seconds.
-  Keep the temperature between 25–75%. The round pauses while the browser tab is inactive.
-- Score: 70% timing accuracy + 30% safe-temperature duration, minus 4 points for each
-  overheat. Quality: Failed <35, Clumsy 35–61, Good 62–87, Perfect ≥88.
-  A miss ends the combo; repeated clicks within the same pour are not counted.
-- Closing/reloading before finishing: **refunds all materials**. A failure also refunds
-  all materials, and Clumsy refunds the first material. Completed rounds unlock recipes
-  after a total of 1, 3, 5, and 8 rounds, including failed attempts.
+- **Journal** tracks 12 regular species plus the secret **Echo Fish**, including catch counts, best length, and best weight.
+- **Chest** stores up to 54 fish. It can be sorted by newest or heaviest, and fish can be released with confirmation.
+- **Rods** lets you equip Basic, Sturdy, Lucky, Golden, Prismarine, or the forged Warden Rod. Regular upgrades come from fishing milestones.
+- A **Rift catch** can replace a fish with a brewing material. The base chance is 14%, with bonuses from rod luck and Ember Bait. Materials go to the shared **Brewing Bag**.
+- The first five Warden Rod casts have a 20%, 40%, 60%, 80%, and 100% chance of an Echo Fish bite, respectively. From the fifth cast onward, the bite is guaranteed until you land the fish.
 
-| Recipe | Unlocked after | Good-quality reward |
+### Cave Miner — Ore Rush
+
+![Cave Miner during a run with the 7 by 7 mine, pickaxe meter, ore legend, and gear panel](docs/screenshots/cave-miner.png)
+
+Pick a route across a fresh **7 × 7** board. Start on the top row, then dig only into blocks next to ones you have already mined. Deeper rows and consecutive ore or material finds raise the score. Stone, gravel, and lava break the combo. Most blocks cost 1 durability, gravel costs 2, and lava costs 4.
+
+A run lasts up to **45 seconds**. Use **Done mining** to bank your score once you have dug at least one block. Ores go to the **Ore Vault** as you mine them. Quartz (rows 4–7) and Glowstone Dust (rows 6–7) go to the Brewing Bag. **Voidsteel** has a 5% chance per block in row 7 and is used in the furnace.
+
+| Pickaxe | Reach | Durability | Upgrade cost |
+| --- | --- | --- | --- |
+| Wood | Rows 1–3 | 22 | Starting pickaxe |
+| Stone | Rows 1–4 | 27 | 8 Coal |
+| Iron | Rows 1–6 | 32 | 8 Iron + 16 Coal |
+| Diamond | Rows 1–7 | 38 | 2 Diamond + 10 Iron + 16 Coal |
+
+### Silent Steps — Deep Dark
+
+![Silent Steps maze showing the entrance, wool tiles, pulse warnings, and the Echo Shard](docs/screenshots/silent-steps.png)
+
+Bring the **Echo Shard** (◆) back to the entrance (⚑) within **30 seconds**. The first step starts the timer. Move one tile per beat using the arrow keys, by clicking an adjacent tile, or with the phone controls. Amber warns of an incoming red pulse, and wool tiles give you a safe place to wait. Two hits wake the Warden. Retry until you bring the shard back.
+
+### Resonance Furnace — Deep Dark
+
+![Resonance Furnace with a 3 by 3 rune puzzle and the moves remaining](docs/screenshots/resonance-furnace.png)
+
+Forge the **Warden Rod** once you have the Echo Shard, one Voidsteel, one Potion of Resonance, and all six hidden artifacts. Enable **Soul Flame** in Nether Brewmaster to light the furnace.
+
+Light all nine runes in **five moves or fewer**. Each press flips the selected rune and its neighbors directly above, below, to the left, and to the right. A failed attempt keeps your ingredients. Forging spends the Voidsteel and potion. Equip the finished rod in the Overworld's **Rods** tab.
+
+### Nether Brewmaster
+
+![Nether Brewmaster during a round with the brewing stand, temperature meter, and timing controls](docs/screenshots/nether-brewmaster.png)
+
+Catch Rift materials in the Overworld or mine Quartz and Glowstone Dust in Cave. The six materials are Nether Wart, Glowstone Dust, Nether Quartz, Magma Cream, Blaze Powder, and Ghast Tear. Claim the one-time starter kit to try the first recipe.
+
+Each **36-second** round uses three ingredients and gives you nine pours. Press **Add** (`Space`) when the marker enters the gold zone. Use **Vent heat** (`V`) to keep heat in the 25–75% safe zone. Precision and time spent at a safe temperature raise the score. Closing an unfinished brew or finishing with Failed quality refunds all three ingredients. Clumsy refunds the first ingredient.
+
+| Recipe | Unlocks after | Reward at Good quality |
 | --- | --- | --- |
-| Experience | Start | Ember Bait, 5 casts |
-| Fire Resistance | 1 round | Ember Bait, 8 casts |
-| Strength | 3 rounds | Luck Potion, 5 casts |
-| Luck | 5 rounds | Luck Potion, 8 casts |
-| Resonance | 8 rounds | 1 Resonance Potion for the furnace |
+| Experience | Available at start | Ember Bait for 5 casts |
+| Fire Resistance | 1 completed round | Ember Bait for 8 casts |
+| Strength | 3 completed rounds | Potion of Luck for 5 casts |
+| Luck | 5 completed rounds | Potion of Luck for 8 casts |
+| Resonance | 8 completed rounds | 1 Potion of Resonance for the furnace |
 
-- Perfect adds 2 bonus casts and 1 **Nether Ember**. Five Perfects
-  unlock the Brewmaster title and the **Soul Flame** cosmetic toggle. Nether Embers
-  are stored as a collection for a future update and do not unlock an ending yet.
-- Bonuses activate automatically, stack, and are consumed **once at
-  the start of a cast**, including failed or cancelled casts. The Luck Potion
-  adds 0.8 luck to fish rarity rolls; it does not change the chest capacity.
-- Recipes, score records, and cosmetics are stored in `portfolio-nether-v1`.
-  The bag, bonuses, starter kit, and material reservations are in `portfolio-fishing-v1`.
-  Older save versions are migrated without losing progress.
+Ember Bait improves material odds, and Potion of Luck improves fish rarity rolls. Both apply automatically and are consumed when a cast starts. A Perfect brew adds a Nether Ember and extends any fishing bonus reward by two casts. Five Perfect brews unlock the **Soul Flame** toggle below the brewing panel.
 
-### Local validation
+### The Last Flight — The End
 
-```sh
-npm run test:games   # Node 22.6+ with TypeScript stripping support
-npm run build       # typecheck + Vite production build
-npm run dev         # manual check: F / N / E
-```
+![Journey mode of The Last Flight with the dragon, End pillars, and mode selector](docs/screenshots/last-flight.png)
 
-The logic tests cover save migration, material vs fish catches, per-cast bonuses,
-material reservation/refund, cooldown, scoring, milestones, and the ending flag.
-For UI checks: claim the starter, try a round with keyboard/touch, check the chest/bag,
-reload while brewing, check the timer when switching tabs, and use a mobile viewport. Game buttons for other biomes will navigate to that biome; the minigame must be opened there.
+Hold the sky or `Space` to dive and release to climb. Fly between the pillars and pass through gold rings for a two-second tailwind.
+
+- **Journey** has three legs and nine pillar gaps. If you hit a pillar, the dragon carries you back to the last checkpoint. Reaching the Overworld lake unlocks the **Dragon Scale** keepsake in the book.
+- **Infinity** has one life. The gaps alternate high and low, get narrower, and come faster as you progress. Your score is distance + 200 per cleared gap + 350 per ring. The browser saves your best score.
+
+<details>
+<summary>Infinity mode screenshot</summary>
+
+![Infinity flight with alternating pillar gaps and a live score counter](docs/screenshots/last-flight-infinity.png)
+
+</details>
+
+## Achievement Book
+
+![Achievement Book showing artifact progress, filters, and unlocked entries](docs/screenshots/achievement-book.png)
+
+Open the book icon at the top or press `E`. The **29 achievements** can be browsed under **All**, **Artifacts**, or **Minigame**. The Deep Dark section's portfolio achievements and certificates are a separate collection managed through the admin panel.
+
+<details>
+<summary>Full achievement checklist (includes game spoilers)</summary>
+
+| Group | Achievement | How to unlock |
+| --- | --- | --- |
+| Artifact | First Steps | Find the Overworld chest |
+| Artifact | Miner's Luck | Find the Cave diamond artifact |
+| Artifact | Deep Listener | Find the Deep Dark sculk sensor |
+| Artifact | Hot Trail | Find the Nether blaze powder artifact |
+| Artifact | Pearl Hunter | Find the ender pearl in The End |
+| Artifact | Final Spark | Find the nether star in Credits |
+| Exploration | Curious Explorer | Find all six hidden artifacts |
+| Fishing | First Catch | Catch your first fish |
+| Fishing | Patient Angler | Catch 25 fish |
+| Fishing | Rod Collector | Unlock all 6 rods |
+| Fishing | Full Collection | Discover all 12 regular fish |
+| Fishing | Echo from Below | Catch the Echo Fish with the Warden Rod |
+| Fishing | Through the Rift | Fish up your first Nether material |
+| Materials | Well Stocked | Discover all 6 brewing materials |
+| Cave | First Strikes | Mine your first ore |
+| Cave | Ore Hoarder | Mine 100 ores in total |
+| Cave | Full Cart | Discover all 7 Cave ores, including Voidsteel |
+| Cave | Fully Upgraded | Upgrade to the diamond pickaxe |
+| Cave | Diamond in the Rough | Mine a diamond |
+| Cave | Chain Reaction | Reach a combo of 8 in one run |
+| Cave | No Lava, No Problem | Finish a run without hitting lava |
+| Cave | Deep Geologist | Mine both Quartz and Glowstone Dust |
+| Brewing | First Brew | Make your first brew at Good quality or better |
+| Brewing | Just Right | Make your first Perfect brew |
+| Brewing | Brewmaster | Make 5 Perfect brews |
+| Brewing | Recipe Collector | Unlock all 5 recipes by completing 8 rounds |
+| Brewing | A Full Shelf | Brew all 5 recipes at Good quality or better |
+| Brewing | Not a Drop Spilled | Hit all 9 pours in one round without overheating |
+| Flight | Dragon Scale | Complete The Last Flight in Journey mode |
+
+</details>
+
+### Credits and completion
+
+Complete every entry in the book, watch the normal credits, and stay on the Credits screen for **15 more seconds** to see a hidden message. With reduced motion enabled, scroll to the end of the credits to start the wait.
+
+### Saved progress
+
+Games and advancements use browser storage and can be played without signing in. Progress belongs to the current browser profile. The book has a reset control, and milestones earned from existing game saves can unlock again.
+
+| Progress | Storage key |
+| --- | --- |
+| Achievement Book | `portfolio-achievements-v1` |
+| Fishing, Brewing Bag, cast bonuses, Echo Shard and Warden Rod | `portfolio-fishing-v1` |
+| Cave ores, pickaxe, and mining records | `portfolio-cave-v1` |
+| Brewing recipes, records, Soul Flame, and Resonance Potions | `portfolio-nether-v1` |
+| Infinity best score | `portfolio-end-infinity-best-v1` |
 
 ## Music
 
@@ -243,4 +291,6 @@ npm run dev        # dev server
 npm run build      # typecheck + production build
 npm run preview    # check the build output
 npm run typecheck  # TypeScript only
+npm run test:games # game logic and save migration (Node 22.12+)
+npm run test:security # security configuration checks
 ```
