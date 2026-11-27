@@ -85,7 +85,7 @@ const en = {
   hidden_item: 'Something glimmers here',
   afterword_open: 'Oh, you’re still here?',
   afterword_games: 'I really appreciate you playing all the minigames, collecting every achievement, and sticking around for the credits. I built this for myself, mostly because I wanted to see if I could make all the little ideas in my head work together. I figured I’d be the one person who knew where everything was hidden. Looks like there are two of us now.',
-  afterword_thanks: 'Knowing that someone actually enjoyed something I made enough to spend this much time with it makes me really, really happy. I’m not used to anyone taking this much of an interest in my work. It feels a little strange saying that out loud, so I guess that’s why I put this fifteen seconds after the credits lol.',
+  afterword_thanks: 'Knowing that someone is actually enjoying something I made makes me really, really happy. I don’t think anyone has ever appreciated something I made this much before, so I’m not quite sure how to say it without getting embarrassed lol. I guess that’s why I hid this fifteen seconds after the credits.',
   afterword_goodbye: 'I hope there was one little moment in here that made you smile. You gave me one just by making it this far. Thank you for playing, and for giving me a bit of your day.',
 
   perfect_rift: "Perfect Rift Catch!",
@@ -412,7 +412,7 @@ const id: Record<keyof typeof en, string> = {
   hidden_item: 'Ada sesuatu yang berkilau di sini',
   afterword_open: 'Oh, kamu masih di sini?',
   afterword_games: 'Terima kasih sudah memainkan semua minigame, mengumpulkan setiap pencapaian, dan menunggu sampai kredit selesai. Awalnya aku membuat semua ini untuk diriku sendiri. Aku penasaran apakah ide-ide kecil di kepalaku bisa jadi satu dunia yang bisa dimainkan. Kupikir cuma aku yang bakal tahu di mana semuanya disembunyikan. Sekarang ada dua orang yang tahu.',
-  afterword_thanks: 'Rasanya senang sekali membayangkan seseorang menikmati sesuatu yang kubuat sampai mau menghabiskan waktu selama ini di sini. Aku belum terbiasa melihat orang begitu tertarik dengan karyaku. Agak canggung juga mengatakannya terus terang. Mungkin itu sebabnya pesan ini kusembunyikan lima belas detik setelah kredit.',
+  afterword_thanks: 'Membayangkan ada yang benar-benar menikmati sesuatu yang kubuat bikin aku senang banget. Sepertinya belum pernah ada yang mengapresiasi karyaku sebanyak ini, jadi aku agak bingung mau bilang apa tanpa merasa malu wkwk. Mungkin itu sebabnya pesan ini kusembunyikan lima belas detik setelah kredit.',
   afterword_goodbye: 'Semoga ada satu momen kecil di sini yang membuatmu tersenyum. Membayangkanmu sampai sejauh ini saja sudah membuatku tersenyum. Terima kasih sudah bermain dan meluangkan sebagian waktumu di sini.',
 
   perfect_rift: "Tangkapan Rift Sempurna!",
